@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import './App.css'
+import React from 'react';
+import HomePage from './pages/HomePage';
 
 function App() {
   return (
     <div>
-      <h1>Приложение запущено</h1>
+      <HomePage />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
