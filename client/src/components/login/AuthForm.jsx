@@ -1,105 +1,132 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import styles from './AuthForm.module.css';
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [formData, setFormData] = useState({
+    email: '',
+    username: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
+    setFormData({
+      email: '',
+      username: '',
+      password: ''
+    });
+    setError('');
+  };
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const url = isLogin ? '/api/auth/login' : '/api/auth/register';
+
+    try {
+      const response = await fetch(`http://localhost:5000${url}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || 'Something went wrong');
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
+      setError('Something went wrong');
+    }
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:5000/api/auth/google';
   };
 
   return (
-    <div style={{
-      maxWidth: '400px',
-      margin: '5rem auto',
-      padding: '2rem',
-      borderRadius: '12px',
-      boxShadow: '0 0 20px rgba(0,0,0,0.1)',
-      textAlign: 'center',
-      backgroundColor: '#fff'
-    }}>
-      <p style={{ marginBottom: '1rem' }}>
+    <div className={styles['auth-form']}>
+      <p className={styles['auth-form__title']}>
         You can log in with your Google Account
       </p>
 
-      <a
-        href="http://localhost:5000/api/auth/google" 
-        style={{
-        padding: '0.5rem 1.5rem',
-        marginBottom: '1rem',
-        border: 'none',
-        borderRadius: '25px',
-        backgroundColor: '#fff',
-        boxShadow: '0 0 5px rgba(0,0,0,0.2)',
-        cursor: 'pointer'
-      }}>
+      <button
+        onClick={handleGoogleLogin}
+        className={`${styles['auth-form__button']} ${styles['auth-form__button--google']}`}
+      >
         Continue with Google
-      </a>
+      </button>
 
       <p style={{ margin: '1rem 0' }}>
-        Or log in using an email and password, after registering:
+        Or use your email and password:
       </p>
 
-      <form style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <form onSubmit={handleSubmit} className={styles['auth-form__form']}>
         <input
           type="email"
-          placeholder="your@email.com"
-          style={inputStyle}
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+          className={styles['auth-form__input']}
         />
         {!isLogin && (
           <input
             type="text"
-            placeholder="User name"
-            style={inputStyle}
+            name="username"
+            placeholder="Username"
+            value={formData.username}
+            onChange={handleChange}
+            required
+            className={styles['auth-form__input']}
           />
         )}
         <input
           type="password"
+          name="password"
           placeholder="Password"
-          style={inputStyle}
+          value={formData.password}
+          onChange={handleChange}
+          required
+          className={styles['auth-form__input']}
         />
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
           <button
             type="submit"
-            style={{
-              ...buttonStyle,
-              backgroundColor: '#ff6600',
-              color: 'white'
-            }}
+            className={`${styles['auth-form__button']} ${styles['auth-form__button--primary']}`}
           >
-            {isLogin ? 'LOG IN' : 'SIGN UP'}
+            {isLogin ? 'LOG IN' : 'REGISTER'}
           </button>
 
           <button
             type="button"
             onClick={toggleMode}
-            style={{
-              ...buttonStyle,
-              backgroundColor: '#f0f0f0',
-              color: '#333'
-            }}
+            className={`${styles['auth-form__button']} ${styles['auth-form__button--secondary']}`}
           >
-            {isLogin ? 'REGISTRATION' : 'LOGIN'}
+            {isLogin ? 'REGISTER' : 'LOGIN'}
           </button>
         </div>
       </form>
+
+      {error && <p className={styles['auth-form__error']}>{error}</p>}
     </div>
   );
-};
-
-const inputStyle = {
-  padding: '0.75rem 1rem',
-  borderRadius: '12px',
-  border: '1px solid #ccc',
-  width: '100%'
-};
-
-const buttonStyle = {
-  padding: '0.75rem 1.5rem',
-  borderRadius: '25px',
-  border: 'none',
-  cursor: 'pointer',
-  fontWeight: 'bold'
 };
 
 export default AuthForm;

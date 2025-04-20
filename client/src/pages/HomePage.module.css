@@ -1,0 +1,19 @@
+.home-page {
+    width: 800px;
+    margin: 5rem auto;
+    padding: 2rem;
+    border-radius: 12px;
+    background-color: #191818;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.984);
+    text-align: center;
+  }
+  
+  .home-page__title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .home-page__form-wrapper {
+    margin-top: 2rem;
+  }
+  

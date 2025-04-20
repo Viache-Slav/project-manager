@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const Dashboard = () => {
           navigate('/');
         }
       } catch (error) {
+        console.error('Error fetching user:', error);
         navigate('/');
       }
     };
@@ -34,39 +36,25 @@ const Dashboard = () => {
     return <p style={{ textAlign: 'center', marginTop: '5rem' }}>Loading...</p>;
   }
 
-  return (
-    <div style={{
-      textAlign: 'center',
-      marginTop: '5rem'
-    }}>
-      <h1>Welcome, {user.name}!</h1>
-      <p>Email: {user.email}</p>
-      {user.avatar && (
-        <img
-          src={user.avatar}
-          alt="User avatar"
-          style={{ width: '100px', height: '100px', borderRadius: '50%', marginTop: '1rem' }}
-        />
-      )}
+  const firstLetter = user.username ? user.username.charAt(0).toUpperCase() : '';
 
-      <div>
-        <button
-          onClick={handleLogout}
-          style={{
-            marginTop: '2rem',
-            padding: '0.75rem 1.5rem',
-            borderRadius: '25px',
-            border: 'none',
-            cursor: 'pointer',
-            backgroundColor: '#ff6600',
-            color: 'white',
-            fontSize: '1rem',
-            fontWeight: 'bold'
-          }}
-        >
-          LOGOUT
-        </button>
+  return (
+    <div className={styles['dashboard']}>
+      <div className={styles['dashboard__avatar']}>
+        {firstLetter}
       </div>
+
+      <div className={styles['dashboard__info']}>
+        <h1>Welcome, {user.username}!</h1>
+        <p className={styles['dashboard__email']}>Email: {user.email}</p>
+      </div>
+
+      <button
+        onClick={handleLogout}
+        className={styles['dashboard__logout-button']}
+      >
+        LOGOUT
+      </button>
     </div>
   );
 };

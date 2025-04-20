@@ -1,0 +1,56 @@
+.auth-form {
+    width: 400px;
+    margin: 5rem auto;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    text-align: center;
+    background-color: #0f0f0f;
+  }
+  
+  .auth-form__title {
+    margin-bottom: 1rem;
+  }
+  
+  .auth-form__button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .auth-form__button--primary {
+    background-color: #ff6600;
+    color: white;
+  }
+  
+  .auth-form__button--secondary {
+    background-color: #ece5e5;
+    color: #333;
+  }
+  
+  .auth-form__button--google {
+    background-color: #141414;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    margin-bottom: 1rem;
+    color: rgb(12, 121, 211);
+  }
+  
+  .auth-form__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .auth-form__input {
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+  }
+  
+  .auth-form__error {
+    color: red;
+    margin-top: 1rem;
+  }
+  

@@ -21,9 +21,14 @@ passport.use(new GoogleStrategy({
         user = await User.create({
           googleId: profile.id,
           email: profile.emails[0].value,
-          name: profile.displayName,
+          username: profile.displayName,
           avatar: profile.photos[0].value
         });
+      }
+      
+      if (!user.username) {
+        user.username = profile.displayName;
+        await user.save();
       }
 
       done(null, user);
