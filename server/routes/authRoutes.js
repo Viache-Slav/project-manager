@@ -14,4 +14,23 @@ router.get('/google/callback',
   }
 );
 
+router.get('/logout', (req, res) => {
+  req.logout(function(err) {
+    if (err) { return next(err); }
+
+    req.session.destroy(() => {
+      res.redirect('http://localhost:5173/');
+    });
+  });
+});
+
+router.get('/user', (req, res) => {
+  if (req.isAuthenticated()) {
+    res.json(req.user);
+  } else {
+    res.status(401).json({ message: 'Unauthorized' });
+  }
+});
+
+
 export default router;
