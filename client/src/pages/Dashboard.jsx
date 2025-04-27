@@ -30,11 +30,14 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (user) {
-      if (user.status !== 'approved' && user.role !== 'admin') {
+      if (!user.role) {
+        navigate('/choose-role');
+      } else if (user.status !== 'approved' && user.role !== 'admin') {
         navigate('/pending-approval');
       }
     }
   }, [user, navigate]);
+  
 
   const handleLogout = () => {
     window.location.href = 'http://localhost:5000/api/auth/logout';
