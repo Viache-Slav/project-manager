@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Dashboard.module.css';
+import AdminPanel from '../components/admin-panel/AdminPanel.jsx';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -65,6 +66,10 @@ const Dashboard = () => {
         )}
       </div>
 
+      {user?.role === 'admin' && (
+        <AdminPanel />
+      )}
+      
       <button
         onClick={handleLogout}
         className={styles['dashboard__logout-button']}
