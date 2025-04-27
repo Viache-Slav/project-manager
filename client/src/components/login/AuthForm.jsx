@@ -7,7 +7,8 @@ const AuthForm = () => {
   const [formData, setFormData] = useState({
     email: '',
     username: '',
-    password: ''
+    password: '',
+    role: 'employee'
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -105,6 +106,18 @@ const AuthForm = () => {
           required
           className={styles['auth-form__input']}
         />
+        {!isLogin && (
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            required
+            className={styles['auth-form__input']}
+          >
+            <option value="employee">Employee</option>
+            <option value="admin">Leader</option>
+          </select>
+        )}
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
           <button

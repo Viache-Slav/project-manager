@@ -1,8 +1,32 @@
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 
+export const setRole = async (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  const { role } = req.body;
+
+  if (!['admin', 'employee'].includes(role)) {
+    return res.status(400).json({ message: 'Invalid role' });
+  }
+
+  try {
+    req.user.role = role;
+    req.user.status = 'pending';
+    await req.user.save();
+
+    res.status(200).json({ message: 'Role set successfully, awaiting approval' });
+  } catch (error) {
+    console.error('Error setting role:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
 export const registerUser = async (req, res) => {
-  const { email, password, username } = req.body;
+  const { email, password, username, role } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -16,7 +40,8 @@ export const registerUser = async (req, res) => {
     const newUser = new User({
       email,
       password: hashedPassword,
-      username: username
+      username: username,
+      role
     });
 
     await newUser.save();

@@ -12,7 +12,7 @@ const Dashboard = () => {
         const response = await fetch('http://localhost:5000/api/auth/user', {
           credentials: 'include',
         });
-
+  
         if (response.ok) {
           const userData = await response.json();
           setUser(userData);
@@ -24,9 +24,17 @@ const Dashboard = () => {
         navigate('/');
       }
     };
-
+  
     checkAuth();
   }, [navigate]);
+
+  useEffect(() => {
+    if (user) {
+      if (user.status !== 'approved' && user.role !== 'admin') {
+        navigate('/pending-approval');
+      }
+    }
+  }, [user, navigate]);
 
   const handleLogout = () => {
     window.location.href = 'http://localhost:5000/api/auth/logout';
@@ -47,6 +55,11 @@ const Dashboard = () => {
       <div className={styles['dashboard__info']}>
         <h1>Welcome, {user.username}!</h1>
         <p className={styles['dashboard__email']}>Email: {user.email}</p>
+        {user?.role === 'admin' && (
+          <button onClick={() => navigate('/upload')}>
+            Being finalized
+          </button>
+        )}
       </div>
 
       <button

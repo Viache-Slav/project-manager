@@ -1,8 +1,13 @@
 import express from 'express';
 import passport from 'passport';
 import { registerUser, loginUser } from '../controllers/authController.js';
+import { checkRole } from '../middleware/checkRole.js';
+import { uploadController } from '../controllers/uploadController.js';
+import { setRole } from '../controllers/authController.js';
 
 const router = express.Router();
+
+router.patch('/set-role', setRole);
 
 router.get('/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
@@ -27,6 +32,7 @@ router.get('/logout', (req, res) => {
 
 router.post('/register', registerUser);
 router.post('/login', loginUser);
+router.post('/upload', checkRole('admin'), uploadController);
 
 router.get('/user', (req, res) => {
   if (req.isAuthenticated()) {

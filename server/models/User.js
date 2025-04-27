@@ -25,6 +25,16 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
+  },
+  role: {
+    type: String,
+    enum: ['admin', 'employee'],
+    default: null 
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending' 
   }
 });
 
