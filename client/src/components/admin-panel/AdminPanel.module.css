@@ -1,44 +1,37 @@
 .admin-panel {
-  margin-top: 3rem;
-  padding: 1rem;
-  background-color: #1e1e1e;
-  border-radius: 8px;
-  color: #fff;
-}
-
-.admin-panel__title {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  text-align: center;
+  margin-top: 2rem;
 }
 
 .admin-panel__table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1rem;
 }
 
 .admin-panel__table th,
 .admin-panel__table td {
-  padding: 0.75rem;
-  border-bottom: 1px solid #444;
+  border-bottom: 1px solid #555;
+  padding: 0.75rem 1rem;
+  text-align: left;
 }
 
-.admin-panel__actions button {
-  margin: 0.5rem;
-  padding: 5px;
-  font-weight: bold;
+.admin-panel__select {
+  padding: 0.5rem;
+  border-radius: 10px;
+  background-color: #555;
+}
+
+.admin-panel__button{
+  color: white;
   border: none;
-  border-radius: 15px;
   cursor: pointer;
+  border-radius: 10px;
 }
 
-.admin-panel__approve {
+.admin-panel__button-approve {
   background-color: #28a745;
-  color: white;
+  margin-bottom: 5px;
 }
 
-.admin-panel__reject {
+.admin-panel__button-reject {
   background-color: #dc3545;
-  color: white;
 }
