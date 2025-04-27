@@ -41,7 +41,8 @@ export const registerUser = async (req, res) => {
       email,
       password: hashedPassword,
       username: username,
-      role
+      role,
+      status: 'pending'
     });
 
     await newUser.save();

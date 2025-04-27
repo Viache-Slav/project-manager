@@ -26,7 +26,7 @@ const AdminPanel = () => {
 
   const handleApprove = async (userId) => {
     try {
-      await fetch(`http://localhost:5000/api/admin/approve/${userId}`, {
+      await fetch(`http://localhost:5000/api/admin/users/${userId}/approve`, {
         method: 'PATCH',
         credentials: 'include',
       });
@@ -35,10 +35,10 @@ const AdminPanel = () => {
       console.error('Error approving user:', error);
     }
   };
-
+  
   const handleReject = async (userId) => {
     try {
-      await fetch(`http://localhost:5000/api/admin/reject/${userId}`, {
+      await fetch(`http://localhost:5000/api/admin/users/${userId}/reject`, {
         method: 'PATCH',
         credentials: 'include',
       });
@@ -47,6 +47,7 @@ const AdminPanel = () => {
       console.error('Error rejecting user:', error);
     }
   };
+  
 
   return (
     <div className={styles['admin-panel']}>

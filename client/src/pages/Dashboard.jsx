@@ -31,14 +31,13 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (user) {
-      if (!user.role) {
+      if (!user.role && user.googleId) {
         navigate('/choose-role');
-      } else if (user.status !== 'approved' && user.role !== 'admin') {
+      } else if (user.status !== 'approved') {
         navigate('/pending-approval');
       }
     }
-  }, [user, navigate]);
-  
+  }, [user, navigate]);  
 
   const handleLogout = () => {
     window.location.href = 'http://localhost:5000/api/auth/logout';

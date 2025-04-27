@@ -36,8 +36,7 @@ export const rejectUser = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    user.status = 'rejected';
-    await user.save();
+    await user.deleteOne();
 
     res.json({ message: 'User rejected' });
   } catch (error) {
