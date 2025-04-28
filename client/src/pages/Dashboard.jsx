@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Dashboard.module.css';
 import AdminPanel from '../components/admin-panel/AdminPanel.jsx';
+import UploadForm from '../components/upload/UploadForm';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -64,6 +65,10 @@ const Dashboard = () => {
           </button>
         )}
       </div>
+
+      {user?.role === 'admin' && (
+        <UploadForm />
+      )}
 
       {user?.role === 'admin' && (
         <AdminPanel />
