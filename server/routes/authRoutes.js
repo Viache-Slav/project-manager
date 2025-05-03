@@ -19,10 +19,20 @@ router.get('/google/callback',
 );
 
 router.get('/logout', (req, res) => {
-  req.logout(function(err) {
-    if (err) { return next(err); }
+  console.log('FRONTEND_URL is:', process.env.FRONTEND_URL);
+
+  req.logout(function (err) {
+    if (err) {
+      return res.status(500).json({ message: 'Logout error' });
+    }
 
     req.session.destroy(() => {
+      res.clearCookie('connect.sid', {
+        path: '/',
+        sameSite: 'none',
+        secure: true
+      });
+
       res.redirect(`${process.env.FRONTEND_URL}/`);
     });
   });
