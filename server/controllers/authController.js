@@ -1,6 +1,5 @@
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
-import mongoose from 'mongoose';
 
 export const setRole = async (req, res) => {
   if (!req.isAuthenticated()) {
@@ -71,14 +70,15 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
+  // 🔐 Специальный случай — вход как "админ без записи в базе"
   if (email === 'admin@gmail.com' && password === '1111') {
-    const mockAdmin = new User({
-      _id: new mongoose.Types.ObjectId(),
+    const mockAdmin = {
+      _id: 'admin-static-id',
       email: 'admin@gmail.com',
       username: 'SuperAdmin',
       role: 'admin',
       status: 'approved'
-    });
+    };
 
     req.login(mockAdmin, (err) => {
       if (err) {
