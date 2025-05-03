@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from '../../api/axios';
 import styles from './UploadForm.module.css';
 
 const UploadForm = () => {
@@ -10,21 +11,12 @@ const UploadForm = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/api/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ title, description })
-      });
+      await axios.post('/upload', { title, description });
 
-      if (response.ok) {
-        setSuccess(true);
-        setTitle('');
-        setDescription('');
-        setTimeout(() => setSuccess(false), 2000);
-      } else {
-        console.error('Failed to upload product');
-      }
+      setSuccess(true);
+      setTitle('');
+      setDescription('');
+      setTimeout(() => setSuccess(false), 2000);
     } catch (error) {
       console.error('Error uploading product:', error);
     }

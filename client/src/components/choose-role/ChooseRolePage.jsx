@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from '../../api/axios';
 
 const ChooseRolePage = () => {
   const [role, setRole] = useState('employee');
@@ -9,22 +10,11 @@ const ChooseRolePage = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/set-role', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({ role })
-      });
-
-      if (response.ok) {
-        navigate('/pending-approval');
-      } else {
-        alert('Role selection error');
-      }
+      await axios.patch('/auth/set-role', { role });
+      navigate('/pending-approval');
     } catch (error) {
       console.error('Error submitting role:', error);
+      alert('Role selection error');
     }
   };
 
@@ -38,7 +28,7 @@ const ChooseRolePage = () => {
         </select>
         <br />
         <button type="submit" style={{ marginTop: '2rem' }}>
-        Confirm selection
+          Confirm selection
         </button>
       </form>
     </div>

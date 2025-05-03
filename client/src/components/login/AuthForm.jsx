@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from '../../api/axios';
 import styles from './AuthForm.module.css';
 
 const AuthForm = () => {
@@ -18,7 +19,8 @@ const AuthForm = () => {
     setFormData({
       email: '',
       username: '',
-      password: ''
+      password: '',
+      role: 'employee'
     });
     setError('');
   };
@@ -32,26 +34,14 @@ const AuthForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = isLogin ? '/api/auth/login' : '/api/auth/register';
+    const url = isLogin ? '/auth/login' : '/auth/register';
 
     try {
-      const response = await fetch(`http://localhost:5000${url}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(formData)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.message || 'Something went wrong');
-      } else {
-        navigate('/dashboard');
-      }
+      await axios.post(url, formData);
+      navigate('/dashboard');
     } catch (error) {
-      console.error('Submit error:', error);
-      setError('Something went wrong');
+      const message = error.response?.data?.message || 'Something went wrong';
+      setError(message);
     }
   };
 

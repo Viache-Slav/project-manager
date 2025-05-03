@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from '../api/axios';
 import styles from './Dashboard.module.css';
 import AdminPanel from '../components/admin-panel/AdminPanel.jsx';
 import UploadForm from '../components/upload/UploadForm';
@@ -12,22 +13,14 @@ const Dashboard = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/auth/user', {
-          credentials: 'include',
-        });
-  
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-        } else {
-          navigate('/');
-        }
+        const { data } = await axios.get('/auth/user');
+        setUser(data);
       } catch (error) {
         console.error('Error fetching user:', error);
         navigate('/');
       }
     };
-  
+
     checkAuth();
   }, [navigate]);
 
@@ -39,7 +32,7 @@ const Dashboard = () => {
         navigate('/pending-approval');
       }
     }
-  }, [user, navigate]);  
+  }, [user, navigate]);
 
   const handleLogout = () => {
     window.location.href = 'http://localhost:5000/api/auth/logout';
@@ -67,18 +60,10 @@ const Dashboard = () => {
         )}
       </div>
 
-      {user?.role === 'admin' && (
-        <AdminPanel />
-      )}
+      {user?.role === 'admin' && <AdminPanel />}
+      {user?.role === 'admin' && <TrackManager />}
+      {user?.role === 'admin' && <UploadForm />}
 
-      {user?.role === 'admin' && (
-        <TrackManager />
-      )}
-
-      {user?.role === 'admin' && (
-        <UploadForm />
-      )}
-      
       <button
         onClick={handleLogout}
         className={styles['dashboard__logout-button']}

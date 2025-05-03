@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from '../../api/axios';
 import styles from './TrackManager.module.css';
 
 const TrackManager = () => {
@@ -14,34 +15,20 @@ const TrackManager = () => {
 
   const fetchRoutes = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/routes', {
-        credentials: 'include',
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setRoutes(data);
-      } else {
-        console.error('Error in receiving traces:', res.statusText);
-      }
+      const { data } = await axios.get('/routes');
+      setRoutes(data);
     } catch (err) {
-      console.error('Error in receiving traces:', err);
+      console.error('Error fetching routes:', err);
     }
   };
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/products', {
-        credentials: 'include',
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setProducts(data);
-        setQuantities({});
-      } else {
-        console.error('Error in receiving products:', res.statusText);
-      }
+      const { data } = await axios.get('/products');
+      setProducts(data);
+      setQuantities({});
     } catch (err) {
-      console.error('Error in receiving products:', err);
+      console.error('Error fetching products:', err);
     }
   };
 
@@ -70,27 +57,16 @@ const TrackManager = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/routes', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          departureTime,
-          items
-        }),
+      await axios.post('/routes', {
+        departureTime,
+        items
       });
 
-      if (response.ok) {
-        alert('Track successfully created');
-        setDepartureTime('');
-        setQuantities({});
-        setShowForm(false);
-        fetchRoutes();
-      } else {
-        alert('Error when creating a track');
-      }
+      alert('Track successfully created');
+      setDepartureTime('');
+      setQuantities({});
+      setShowForm(false);
+      fetchRoutes();
     } catch (err) {
       console.error('Error when creating a track:', err);
       alert('Error when creating a track');
@@ -160,7 +136,7 @@ const TrackManager = () => {
           <li className={styles['track-manager__item']} key={route._id}>
             <strong>{new Date(route.departureTime).toLocaleString('en-US', {
               year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-            })}</strong> — items: {route.items.reduce((total, item) => total + item.quantity, 0)}
+            })}</strong> — items: {route.items.reduce((sum, item) => sum + item.quantity, 0)}
           </li>
         ))}
       </ul>

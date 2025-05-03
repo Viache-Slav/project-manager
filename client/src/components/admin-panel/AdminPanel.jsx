@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from '../../api/axios';
 import styles from './AdminPanel.module.css';
 
 const AdminPanel = () => {
@@ -11,16 +12,8 @@ const AdminPanel = () => {
 
   const fetchPendingUsers = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/admin/pending-users', {
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setPendingUsers(data);
-      } else {
-        console.error('Error fetching pending users');
-      }
+      const { data } = await axios.get('/admin/pending-users');
+      setPendingUsers(data);
     } catch (error) {
       console.error('Error fetching pending users:', error);
     }
@@ -40,18 +33,8 @@ const AdminPanel = () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userId}/approve`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ role: selectedRole })
-      });
-
-      if (response.ok) {
-        fetchPendingUsers();
-      } else {
-        console.error('Error approving user');
-      }
+      await axios.patch(`/admin/users/${userId}/approve`, { role: selectedRole });
+      fetchPendingUsers();
     } catch (error) {
       console.error('Error approving user:', error);
     }
@@ -59,16 +42,8 @@ const AdminPanel = () => {
 
   const handleReject = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userId}/reject`, {
-        method: 'PATCH',
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        fetchPendingUsers();
-      } else {
-        console.error('Error rejecting user');
-      }
+      await axios.patch(`/admin/users/${userId}/reject`);
+      fetchPendingUsers();
     } catch (error) {
       console.error('Error rejecting user:', error);
     }
