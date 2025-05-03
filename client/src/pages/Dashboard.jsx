@@ -35,7 +35,7 @@ const Dashboard = () => {
   }, [user, navigate]);
 
   const handleLogout = () => {
-    window.location.href = 'http://localhost:5000/api/auth/logout';
+    window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/logout`;
   };
 
   if (!user) {
