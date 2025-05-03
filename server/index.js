@@ -13,6 +13,8 @@ import trackRoutes from './routes/trackRoutes.js';
 dotenv.config()
 const app = express()
 
+app.set('trust proxy', 1)
+
 app.use(session({
   secret: 'some secret key',
   resave: false,
