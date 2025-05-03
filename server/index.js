@@ -18,7 +18,11 @@ app.set('trust proxy', 1)
 app.use(session({
   secret: 'some secret key',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
+  cookie: {
+    secure: true,     
+    sameSite: 'none'   
+  }
 }));
 app.use(cors({
   origin: process.env.FRONTEND_URL,
