@@ -4,6 +4,7 @@ import { registerUser, loginUser } from '../controllers/authController.js';
 import { setRole } from '../controllers/authController.js';
 
 const router = express.Router();
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 router.patch('/set-role', setRole);
 
@@ -14,13 +15,11 @@ router.get('/google',
 router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
-    res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
+    res.redirect(`${FRONTEND_URL}/dashboard`);
   }
 );
 
 router.get('/logout', (req, res) => {
-  console.log('FRONTEND_URL is:', process.env.FRONTEND_URL);
-
   req.logout(function (err) {
     if (err) {
       return res.status(500).json({ message: 'Logout error' });
@@ -29,11 +28,11 @@ router.get('/logout', (req, res) => {
     req.session.destroy(() => {
       res.clearCookie('connect.sid', {
         path: '/',
-        sameSite: 'none',
-        secure: true
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        secure: process.env.NODE_ENV === 'production',
       });
 
-      res.redirect(`${process.env.FRONTEND_URL}/`);
+      res.redirect(`${FRONTEND_URL}/`);
     });
   });
 });

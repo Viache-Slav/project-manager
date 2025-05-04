@@ -4,6 +4,7 @@ import passport from 'passport';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
+
 import authRoutes from './routes/authRoutes.js';
 import './config/passport.js';
 import adminRoutes from './routes/adminRoutes.js';
@@ -11,7 +12,13 @@ import uploadRoutes from './routes/uploadRoutes.js';
 import trackRoutes from './routes/trackRoutes.js';
 
 dotenv.config()
+
 const app = express()
+const isProduction = process.env.NODE_ENV === 'production';
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://project-manager-rouge.vercel.app'
+];
 
 app.set('trust proxy', 1)
 
@@ -20,17 +27,26 @@ app.use(session({
   resave: false,
   saveUninitialized: true,
   cookie: {
-    secure: true,     
-    sameSite: 'none'   
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax'  
   }
 }));
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true 
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
 }));
+
 app.use(express.json())
 app.use(passport.initialize());
 app.use(passport.session());
+
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api', uploadRoutes);

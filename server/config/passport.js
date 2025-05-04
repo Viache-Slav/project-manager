@@ -5,9 +5,13 @@ import User from '../models/User.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const BACKEND_URL = process.env.BACKEND_URL;
+const BACKEND_URL = isProduction
+  ? process.env.BACKEND_URL
+  : 'http://localhost:5000';
 
 passport.use(new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
