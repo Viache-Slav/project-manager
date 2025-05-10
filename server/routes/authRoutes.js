@@ -1,7 +1,6 @@
 import express from 'express';
 import passport from 'passport';
-import { registerUser, loginUser } from '../controllers/authController.js';
-import { setRole } from '../controllers/authController.js';
+import { registerUser, loginUser, setRole } from '../controllers/authController.js';
 
 const router = express.Router();
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';

@@ -10,7 +10,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         <Route path="/choose-role" element={<ChooseRolePage />} />
         <Route path="/pending-approval" element={<PendingApprovalPage />} />
       </Routes>
