@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
 import ChooseRolePage from './components/choose-role/ChooseRolePage';
 import PendingApprovalPage from './components/choose-role/PendingApprovalPage';
+import PrivateRoute from './components/PrivateRoute';
 
 function App() {
   return (
