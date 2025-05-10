@@ -1,25 +1,28 @@
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 export const setRole = async (req, res) => {
-  if (!req.isAuthenticated()) {
+  const { role } = req.body;
+
+  if (!req.user) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
-
-  const { role } = req.body;
 
   if (!['admin', 'employee'].includes(role)) {
     return res.status(400).json({ message: 'Invalid role' });
   }
 
   try {
-    req.user.role = role;
-    req.user.status = 'pending';
-    await req.user.save();
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.role = role;
+    user.status = 'pending';
+    await user.save();
 
     res.status(200).json({ message: 'Role set successfully, awaiting approval' });
   } catch (error) {
-    console.error('Error setting role:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -52,22 +55,16 @@ export const registerUser = async (req, res) => {
 
     await newUser.save();
 
-    req.login(newUser, (err) => {
-      if (err) {
-        return res.status(500).json({ message: 'Login error' });
+    res.status(200).json({ 
+      message: 'Registration successful', 
+      user: {
+        id: newUser._id,
+        username: newUser.username,
+        email: newUser.email
       }
-      res.status(200).json({ 
-        message: 'Registration successful', 
-        user: {
-          id: newUser._id,
-          username: newUser.username,
-          email: newUser.email
-        }
-      });
     });
 
   } catch (error) {
-    console.error('Error during registration:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -98,21 +95,23 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    req.login(user, (err) => {
-      if (err) {
-        return res.status(500).json({ message: 'Login error' });
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.status(200).json({ 
+      message: 'Login successful',
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role
       }
-      res.status(200).json({ 
-        message: 'Login successful', 
-        user: {
-          id: user._id,
-          username: user.username,
-          email: user.email
-        }
-      });
     });
   } catch (error) {
-    console.error('Error during login:', error);
     res.status(500).json({ message: 'Server error' });
   }
 };

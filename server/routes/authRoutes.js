@@ -1,11 +1,13 @@
 import express from 'express';
 import passport from 'passport';
+import jwt from 'jsonwebtoken';
 import { registerUser, loginUser, setRole } from '../controllers/authController.js';
+import { protect } from '../middleware/protect.js';
 
 const router = express.Router();
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-router.patch('/set-role', setRole);
+router.patch('/set-role', protect, setRole);
 
 router.get('/google',
   passport.authenticate('google', { scope: ['profile', 'email'] })
@@ -13,39 +15,25 @@ router.get('/google',
 
 router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
-  (req, res) => {
-    res.redirect(`${FRONTEND_URL}/dashboard`);
+  async (req, res) => {
+    const token = jwt.sign(
+      { id: req.user._id, email: req.user.email, role: req.user.role, username: req.user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+    res.redirect(`${FRONTEND_URL}/dashboard?token=${token}`);
   }
 );
 
 router.get('/logout', (req, res) => {
-  req.logout(function (err) {
-    if (err) {
-      return res.status(500).json({ message: 'Logout error' });
-    }
-
-    req.session.destroy(() => {
-      res.clearCookie('connect.sid', {
-        path: '/',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        secure: process.env.NODE_ENV === 'production',
-      });
-
-      res.redirect(`${FRONTEND_URL}/`);
-    });
-  });
+  res.status(200).json({ message: 'Logged out (frontend should clear token)' });
 });
 
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 
-router.get('/user', (req, res) => {
-  if (req.isAuthenticated && req.isAuthenticated()) {
-    return res.json(req.user);
-  } else {
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
+router.get('/user', protect, (req, res) => {
+  res.json(req.user);
 });
-
 
 export default router;

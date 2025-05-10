@@ -15,6 +15,7 @@ const AuthForm = () => {
   const navigate = useNavigate();
 
   const toggleMode = () => {
+    localStorage.removeItem('token'); 
     setIsLogin(!isLogin);
     setFormData({
       email: '',
@@ -35,9 +36,14 @@ const AuthForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const url = isLogin ? '/auth/login' : '/auth/register';
-
+  
     try {
-      await axios.post(url, formData);
+      const res = await axios.post(url, formData);
+  
+      if (isLogin && res.data.token) {
+        localStorage.setItem('token', res.data.token);
+      }
+  
       navigate('/dashboard');
     } catch (error) {
       const message = error.response?.data?.message || 'Something went wrong';
