@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import axios from '../api/axios';
+import axios from '../../api/axios';
 
 const PrivateRoute = ({ children }) => {
     const [user, setUser] = useState(null);
