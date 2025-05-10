@@ -24,9 +24,14 @@ export const setRole = async (req, res) => {
   }
 };
 
-
 export const registerUser = async (req, res) => {
-  const { email, password, username, role } = req.body;
+  let { email, password, username, role } = req.body;
+
+  if (!email || !password || !username || !role) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
+  email = email.trim().toLowerCase();
 
   try {
     const existingUser = await User.findOne({ email });
@@ -40,7 +45,7 @@ export const registerUser = async (req, res) => {
     const newUser = new User({
       email,
       password: hashedPassword,
-      username: username,
+      username,
       role,
       status: 'pending'
     });
@@ -68,13 +73,23 @@ export const registerUser = async (req, res) => {
 };
 
 export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  let { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
+
+  email = email.trim().toLowerCase();
 
   try {
     const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    if (user.status !== 'approved') {
+      return res.status(403).json({ message: 'Your account is not approved yet' });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
