@@ -16,7 +16,7 @@ const AuthForm = () => {
   const navigate = useNavigate();
 
   const toggleMode = () => {
-    localStorage.removeItem('token'); 
+    localStorage.removeItem('token');
     setIsLogin(!isLogin);
     setFormData({
       email: '',
@@ -36,14 +36,15 @@ const AuthForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const url = isLogin ? '/auth/login' : '/auth/register';
-  
+    const url = isLogin
+      ? `${import.meta.env.VITE_API_URL}/auth/login`
+      : `${import.meta.env.VITE_API_URL}/auth/register`;
+
     try {
       const res = await axios.post(url, formData);
       if (isLogin && res.data.token) {
         localStorage.setItem('token', res.data.token);
       }
-  
       navigate('/dashboard');
     } catch (error) {
       const message = error.response?.data?.message || 'Something went wrong';
@@ -60,7 +61,9 @@ const AuthForm = () => {
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
         <GoogleLogin
           onSuccess={credentialResponse => {
-            axios.post('/auth/google-login', { token: credentialResponse.credential })
+            axios.post(`${import.meta.env.VITE_API_URL}/auth/google-login`, {
+              credential: credentialResponse.credential
+            })
               .then(res => {
                 localStorage.setItem('token', res.data.token);
                 navigate('/dashboard');
