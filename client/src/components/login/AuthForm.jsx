@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../../api/axios';
 import styles from './AuthForm.module.css';
+import { GoogleLogin } from '@react-oauth/google';
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -39,7 +40,6 @@ const AuthForm = () => {
   
     try {
       const res = await axios.post(url, formData);
-  
       if (isLogin && res.data.token) {
         localStorage.setItem('token', res.data.token);
       }
@@ -51,22 +51,25 @@ const AuthForm = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
-  };
-
   return (
     <div className={styles['auth-form']}>
       <p className={styles['auth-form__title']}>
         You can log in with your Google Account
       </p>
 
-      <button
-        onClick={handleGoogleLogin}
-        className={`${styles['auth-form__button']} ${styles['auth-form__button--google']}`}
-      >
-        Continue with Google
-      </button>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+        <GoogleLogin
+          onSuccess={credentialResponse => {
+            axios.post('/auth/google-login', { token: credentialResponse.credential })
+              .then(res => {
+                localStorage.setItem('token', res.data.token);
+                navigate('/dashboard');
+              })
+              .catch(() => setError('Google login failed'));
+          }}
+          onError={() => setError('Google login failed')}
+        />
+      </div>
 
       <p style={{ margin: '1rem 0' }}>
         Or use your email and password:

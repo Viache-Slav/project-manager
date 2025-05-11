@@ -7,6 +7,13 @@ const PrivateRoute = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tokenFromGoogle = urlParams.get('token');
+        if (tokenFromGoogle) {
+            localStorage.setItem('token', tokenFromGoogle);
+            window.history.replaceState(null, '', '/dashboard');
+        }
+
         axios.get('/auth/user')
             .then(res => setUser(res.data))
             .catch(() => setUser(null))

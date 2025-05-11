@@ -1,36 +1,25 @@
 import express from 'express';
-import session from 'express-session';
-import passport from 'passport';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 
 import authRoutes from './routes/authRoutes.js';
-import './config/passport.js';
 import adminRoutes from './routes/adminRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import trackRoutes from './routes/trackRoutes.js';
 
-dotenv.config()
+dotenv.config();
 
-const app = express()
+const app = express();
+
 const isProduction = process.env.NODE_ENV === 'production';
+
 const allowedOrigins = [
   'http://localhost:5173',
   'https://project-manager-rouge.vercel.app'
 ];
 
-app.set('trust proxy', 1)
-
-app.use(session({
-  secret: 'some secret key',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: isProduction,
-    sameSite: isProduction ? 'none' : 'lax'  
-  }
-}));
+app.set('trust proxy', 1);
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -43,9 +32,7 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json())
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);

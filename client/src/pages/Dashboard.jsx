@@ -11,6 +11,13 @@ const Dashboard = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenFromGoogle = urlParams.get('token');
+    if (tokenFromGoogle) {
+      localStorage.setItem('token', tokenFromGoogle);
+      window.history.replaceState(null, '', '/dashboard');
+    }
+  
     const checkAuth = async () => {
       try {
         const { data } = await axios.get('/auth/user');
@@ -20,7 +27,7 @@ const Dashboard = () => {
         navigate('/');
       }
     };
-
+  
     checkAuth();
   }, [navigate]);
 
