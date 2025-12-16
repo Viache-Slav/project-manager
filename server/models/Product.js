@@ -9,18 +9,52 @@ const productSchema = new Schema(
       required: true,
       trim: true,
     },
+
     description: {
       type: String,
       trim: true,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
+
+    article: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+
+    class: {
+      type: String,
+      trim: true,
+    },
+
+    image: {
+      type: String, // URL
+      trim: true,
+    },
+
+    materials: [
+      {
+        material: {
+          type: Schema.Types.ObjectId,
+          ref: 'Material',
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
+
+    productPrice: {
+      type: Number,
+      required: true,
     },
   },
-  { versionKey: false }
+  {
+    timestamps: true,
+    versionKey: false,
+  }
 );
 
-const Product = model('Product', productSchema);
-
-export default Product;
+export default model('Product', productSchema);

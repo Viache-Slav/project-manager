@@ -5,7 +5,7 @@ import cors from 'cors';
 
 import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
-import uploadRoutes from './routes/uploadRoutes.js';
+import productRoutes from './routes/productRoutes.js';
 import trackRoutes from './routes/trackRoutes.js';
 
 dotenv.config();
@@ -36,7 +36,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api', uploadRoutes);
+app.use('/api/products', productRoutes);
 app.use('/api/routes', trackRoutes);
 
 app.get('/', (req, res) => {

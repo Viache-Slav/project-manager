@@ -1,53 +1,166 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from '../../api/axios';
 import styles from './UploadForm.module.css';
 
-const UploadForm = () => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [success, setSuccess] = useState(false);
+const UploadForm = ({ onCreated }) => {
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    article: '',
+    class: '',
+    productPrice: '',
+    image: '',
+  });
+
+  const [status, setStatus] = useState({ type: '', text: '' });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    e.stopPropagation();
+
+    setStatus({ type: '', text: '' });
+    setLoading(true);
 
     try {
-      await axios.post('/upload', { title, description });
+      const payload = {
+        ...form,
+        productPrice: Number(form.productPrice),
+        materials: [],
+      };
 
-      setSuccess(true);
-      setTitle('');
-      setDescription('');
-      setTimeout(() => setSuccess(false), 2000);
-    } catch (error) {
-      console.error('Error uploading product:', error);
+      const { data } = await axios.post('/products', payload);
+
+      setStatus({
+        type: 'success',
+        text: `Product created: ${data.title} (${data.article})`,
+      });
+
+      if (onCreated) {
+        onCreated();
+      }
+
+      setForm({
+        title: '',
+        description: '',
+        article: '',
+        class: '',
+        productPrice: '',
+        image: '',
+      });
+
+      setTimeout(() => {
+        setStatus({ type: '', text: '' });
+      }, 3000);
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        'Failed to create product';
+
+      setStatus({ type: 'error', text: msg });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className={styles['upload-form']}>
-      <h2 className={styles['upload-form__title']}>Upload New Product</h2>
+    <form className={styles.form} onSubmit={handleSubmit} onClick={(e) => e.stopPropagation()}>
+      <h3>Add new product</h3>
 
-      <form onSubmit={handleSubmit} className={styles['upload-form__form']}>
-        <input
-          type="text"
-          placeholder="Product Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-          className={styles['upload-form__input']}
-        />
-        <textarea
-          placeholder="Product Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className={styles['upload-form__textarea']}
-        />
-        <button type="submit" className={styles['upload-form__button']}>
-          Upload
-        </button>
-      </form>
+      {status.text && (
+        <div
+          className={`${styles.notice} ${
+            status.type === 'success' ? styles.success : styles.error
+          }`}
+        >
+          {status.text}
+        </div>
+      )}
 
-      {success && <p className={styles['upload-form__success']}>Product uploaded successfully!</p>}
-    </div>
+      <div className={styles.section}>
+        <h4>Basic information</h4>
+
+        <label>
+          Name
+          <input
+            name="title"
+            value={form.title}
+            onChange={handleChange}
+            required
+          />
+        </label>
+
+        <label>
+          Description
+          <textarea
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+          />
+        </label>
+
+        <div className={styles.row}>
+          <label>
+            Article
+            <input
+              name="article"
+              value={form.article}
+              onChange={handleChange}
+              required
+            />
+          </label>
+
+          <label>
+            Class
+            <input
+              name="class"
+              value={form.class}
+              onChange={handleChange}
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className={styles.section}>
+        <h4>Price</h4>
+
+        <label>
+          Product price (€)
+          <input
+            type="number"
+            name="productPrice"
+            value={form.productPrice}
+            onChange={handleChange}
+            required
+          />
+        </label>
+      </div>
+
+      <div className={styles.section}>
+        <h4>Image</h4>
+
+        <label>
+          Image URL
+          <input
+            name="image"
+            value={form.image}
+            onChange={handleChange}
+          />
+        </label>
+      </div>
+
+      <button type="submit" className={styles.submit} disabled={loading}>
+        {loading ? 'Creating...' : 'Create product'}
+      </button>
+    </form>
   );
 };
 

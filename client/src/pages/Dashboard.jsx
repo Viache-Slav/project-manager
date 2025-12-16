@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../api/axios';
 import styles from './Dashboard.module.css';
 import AdminPanel from '../components/admin-panel/AdminPanel.jsx';
 import UploadForm from '../components/upload/UploadForm';
 import TrackManager from '../components/track/TrackManager';
+import ProductList from '../components/catalog/ProductList';
+import AccordionSection from '../components/ui/AccordionSection';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+
+  const reloadProductsRef = useRef(null);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -68,9 +72,34 @@ const Dashboard = () => {
         )}
       </div>
 
-      {user?.role === 'admin' && <AdminPanel />}
-      {user?.role === 'admin' && <TrackManager />}
-      {user?.role === 'admin' && <UploadForm />}
+      {user?.role === 'admin' && (
+        <AccordionSection title="Admin panel">
+          <AdminPanel />
+        </AccordionSection>
+      )}
+
+      <AccordionSection title="Catalog">
+        <ProductList user={user}
+          onReady={(fn) => {
+            reloadProductsRef.current = fn;
+          }}/>
+      </AccordionSection>
+
+      {user?.role === 'admin' && (
+        <AccordionSection title="Upload product">
+          <UploadForm onCreated={() => {
+            if (reloadProductsRef.current) {
+              reloadProductsRef.current();
+            }
+          }} />
+        </AccordionSection>
+      )}
+
+      {user?.role === 'admin' && (
+        <AccordionSection title="Tracks">
+          <TrackManager />
+        </AccordionSection>
+      )}
 
       <button
         onClick={handleLogout}
