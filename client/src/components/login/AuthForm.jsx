@@ -9,8 +9,7 @@ const AuthForm = () => {
   const [formData, setFormData] = useState({
     email: '',
     username: '',
-    password: '',
-    role: 'employee'
+    password: ''
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -21,8 +20,7 @@ const AuthForm = () => {
     setFormData({
       email: '',
       username: '',
-      password: '',
-      role: 'employee'
+      password: ''
     });
     setError('');
   };
@@ -36,19 +34,28 @@ const AuthForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const url = isLogin
       ? `${import.meta.env.VITE_API_URL}/auth/login`
       : `${import.meta.env.VITE_API_URL}/auth/register`;
 
     try {
       const res = await axios.post(url, formData);
+
       if (isLogin && res.data.token) {
         localStorage.setItem('token', res.data.token);
+        navigate('/dashboard');
+        return;
       }
-      navigate('/dashboard');
+
+      if (!isLogin) {
+        setError('Registration successful. Wait for admin approval.');
+        setIsLogin(true);
+        setFormData({ email: '', username: '', password: '' });
+      }
+
     } catch (error) {
-      const message = error.response?.data?.message || 'Something went wrong';
-      setError(message);
+      setError(error.response?.data?.message || 'Something went wrong');
     }
   };
 
@@ -108,18 +115,6 @@ const AuthForm = () => {
           required
           className={styles['auth-form__input']}
         />
-        {!isLogin && (
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            required
-            className={styles['auth-form__input']}
-          >
-            <option value="employee">Employee</option>
-            <option value="admin">Leader</option>
-          </select>
-        )}
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '1rem' }}>
           <button

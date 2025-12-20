@@ -37,9 +37,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (user) {
-      if (!user.role && user.googleId) {
-        navigate('/choose-role');
-      } else if (user.status !== 'approved') {
+      if (user.status !== 'approved') {
         navigate('/pending-approval');
       }
     }
@@ -65,11 +63,6 @@ const Dashboard = () => {
       <div className={styles['dashboard__info']}>
         <h1>Welcome, {user.username}!</h1>
         <p className={styles['dashboard__email']}>Email: {user.email}</p>
-        {user?.role === 'admin' && (
-          <button onClick={() => navigate('/upload')}>
-            Being finalized
-          </button>
-        )}
       </div>
 
       {user?.role === 'admin' && (
