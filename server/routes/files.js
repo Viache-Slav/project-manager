@@ -1,14 +1,9 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import { getBucket } from '../config/gridfs.js';
-import { protect } from '../middleware/protect.js';
 
 const router = express.Router();
 
-/**
- * GET /api/files/:id
- * Отдаёт файл из GridFS по ObjectId
- */
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -21,7 +16,6 @@ router.get('/:id', async (req, res) => {
 
     const _id = new mongoose.Types.ObjectId(id);
 
-    // Проверяем, что файл существует
     const files = await bucket.find({ _id }).toArray();
 
     if (!files || files.length === 0) {

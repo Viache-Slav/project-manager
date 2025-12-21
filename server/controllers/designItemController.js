@@ -16,7 +16,6 @@ export const createDesignItem = async (req, res) => {
       return res.status(400).json({ message: 'At least one image is required' });
     }
 
-    // ---- TYPE ----
     let productType;
 
     if (mongoose.Types.ObjectId.isValid(type)) {
@@ -39,7 +38,6 @@ export const createDesignItem = async (req, res) => {
       }
     }
 
-    // ---- DIMENSIONS ----
     const w = Number(width);
     const h = Number(height);
     const d =
@@ -53,7 +51,6 @@ export const createDesignItem = async (req, res) => {
       return res.status(400).json({ message: 'Invalid depth' });
     }
 
-    // ---- IMAGES ----
     const bucket = getBucket();
     const imageIds = [];
 
@@ -76,7 +73,6 @@ export const createDesignItem = async (req, res) => {
       });
     }
 
-    // ---- CREATE ----
     const item = await DesignItem.create({
       title,
       type: productType._id,
@@ -189,7 +185,6 @@ export const updateDesignItem = async (req, res) => {
       return res.status(404).json({ message: 'Item not found' });
     }
 
-    // редактировать можно только submitted
     if (item.status !== 'submitted') {
       return res
         .status(400)

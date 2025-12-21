@@ -5,7 +5,6 @@ let bucket = null;
 export const initGridFS = () => {
   const db = mongoose.connection.db;
 
-  // ВАЖНО: используем GridFSBucket из mongoose
   const { GridFSBucket } = mongoose.mongo;
 
   bucket = new GridFSBucket(db, {

@@ -8,13 +8,13 @@ const calculationSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'DesignItem',
       required: true,
-      unique: true, // 1 расчет на изделие
+      unique: true,
     },
 
     materials: [
       {
         material: {
-          type: String, // id или имя (если новый)
+          type: String,
           required: true,
           trim: true,
         },

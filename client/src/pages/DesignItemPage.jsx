@@ -21,9 +21,6 @@ const DesignItemPage = () => {
   const loadItem = async () => {
     const { data } = await axios.get(`/design-items/${id}`);
     setItem(data);
-
-    // позже сюда подгрузим сохранённый расчет, когда сделаем backend read
-    // сейчас оставляем локально
   };
 
   if (!item) return null;
