@@ -1,0 +1,24 @@
+.wrapper {
+  border: 1px solid #ddd;
+  padding: 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 120px 80px auto;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.remove {
+  background: transparent;
+  border: none;
+  color: red;
+  cursor: pointer;
+}
+
+.add {
+  margin-top: 10px;
+}

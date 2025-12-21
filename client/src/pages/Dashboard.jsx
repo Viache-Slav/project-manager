@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import axios from '../api/axios';
 import styles from './Dashboard.module.css';
 import AdminPanel from '../components/admin-panel/AdminPanel.jsx';
-import UploadForm from '../components/upload/UploadForm';
 import TrackManager from '../components/track/TrackManager';
-import ProductList from '../components/catalog/ProductList';
+import DesignCatalog from '../components/design/DesignCatalog';
 import AccordionSection from '../components/ui/AccordionSection';
+import DesignItemUploadForm from '../components/design/DesignItemUploadForm';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -71,22 +71,13 @@ const Dashboard = () => {
         </AccordionSection>
       )}
 
-      <AccordionSection title="Catalog">
-        <ProductList user={user}
-          onReady={(fn) => {
-            reloadProductsRef.current = fn;
-          }}/>
+      <AccordionSection title="Upload design item">
+        <DesignItemUploadForm onCreated={reloadProductsRef.current} />
       </AccordionSection>
 
-      {user?.role === 'admin' && (
-        <AccordionSection title="Upload product">
-          <UploadForm onCreated={() => {
-            if (reloadProductsRef.current) {
-              reloadProductsRef.current();
-            }
-          }} />
-        </AccordionSection>
-      )}
+      <AccordionSection title="Catalog">
+        <DesignCatalog />
+      </AccordionSection>
 
       {user?.role === 'admin' && (
         <AccordionSection title="Tracks">
