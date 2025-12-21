@@ -19,7 +19,6 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  /* ===== ИНИЦИАЛИЗАЦИЯ ДАННЫХ ===== */
   useEffect(() => {
     if (editingItem) {
       setForm({
@@ -36,7 +35,6 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
     }
   }, [editingItem]);
 
-  /* ===== ОБРАБОТЧИКИ ===== */
   const handleChange = (e) => {
     setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
   };
@@ -45,7 +43,6 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
     setFiles(Array.from(e.target.files));
   };
 
-  /* ===== SUBMIT ===== */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -53,7 +50,6 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
 
     try {
       if (isEdit) {
-        /* ===== EDIT MODE ===== */
         await axios.patch(`/design-items/${editingItem._id}`, {
           ...form,
           dimensions: {
@@ -63,7 +59,6 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
           },
         });
       } else {
-        /* ===== CREATE MODE ===== */
         const fd = new FormData();
 
         files.forEach((f) => fd.append('images', f));
@@ -88,14 +83,12 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
     }
   };
 
-  /* ===== UI ===== */
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
       <h3>{isEdit ? 'Edit item' : 'New item'}</h3>
 
       {error && <div className={styles.error}>{error}</div>}
 
-      {/* ФОТО */}
       {!isEdit && (
         <label>
           Photos *
@@ -108,7 +101,6 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
         </label>
       )}
 
-      {/* НАЗВАНИЕ */}
       <label>
         Title {isEdit ? '' : '*'}
         <input
@@ -119,7 +111,6 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
         />
       </label>
 
-      {/* ТИП */}
       <label>
         Type {isEdit ? '' : '*'}
         <input
@@ -130,7 +121,6 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
         />
       </label>
 
-      {/* РАЗМЕРЫ */}
       <div className={styles.row}>
         <label>
           Width {isEdit ? '' : '*'}
@@ -162,7 +152,6 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
         </label>
       </div>
 
-      {/* КОММЕНТАРИЙ */}
       <label>
         Comment
         <textarea
@@ -172,7 +161,6 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
         />
       </label>
 
-      {/* КНОПКИ */}
       <div className={styles.actions}>
         <button type="submit" disabled={loading}>
           {loading

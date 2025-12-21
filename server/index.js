@@ -49,11 +49,6 @@ app.get('/', (req, res) => {
   res.send('Server is running!');
 });
 
-/**
- * 🔥 ВАЖНО
- * Сервер СЛУШАЕТ порт СРАЗУ
- * Mongo подключается отдельно
- */
 app.listen(PORT, () => {
   console.log('✅ Server running on port', PORT);
 });

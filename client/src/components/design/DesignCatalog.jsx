@@ -9,7 +9,6 @@ const DesignCatalog = () => {
   const [editingItem, setEditingItem] = useState(null);
   const navigate = useNavigate();
 
-  // временно считаем, что каталог для администратора
   const isAdmin = true;
 
   useEffect(() => {
@@ -79,7 +78,6 @@ const DesignCatalog = () => {
         </div>
       </section>
 
-      {/* МОДАЛКА РЕДАКТИРОВАНИЯ */}
       {editingItem && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>

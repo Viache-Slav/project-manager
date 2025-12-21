@@ -44,14 +44,37 @@ const designItemSchema = new Schema(
       trim: true,
     },
 
+    // ✅ РАСЧЁТ ХРАНИТСЯ ЗДЕСЬ
     calculation: {
-      type: Schema.Types.ObjectId,
-      ref: 'DesignCalculation',
+      materials: [
+        {
+          material: {
+            type: Schema.Types.ObjectId,
+            ref: 'Material',
+            required: true,
+          },
+          amount: {
+            type: Number,
+            required: true,
+          },
+          unit: {
+            type: String,
+            required: true,
+          },
+        },
+      ],
+      comment: {
+        type: String,
+        trim: true,
+      },
+      calculatedAt: {
+        type: Date,
+      },
     },
 
     status: {
       type: String,
-      enum: ['submitted', 'to_approve'],
+      enum: ['submitted', 'to_approve', 'approved'],
       default: 'submitted',
     },
 

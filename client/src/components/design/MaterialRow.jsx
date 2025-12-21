@@ -11,7 +11,6 @@ const MaterialRow = ({
 }) => {
   return (
     <div className={styles.row}>
-      {/* Материал */}
       <input
         list="materials"
         value={row.material}
@@ -28,7 +27,6 @@ const MaterialRow = ({
         ))}
       </datalist>
 
-      {/* Количество */}
       <input
         type="number"
         min="0"
@@ -41,7 +39,6 @@ const MaterialRow = ({
         placeholder="Кол-во"
       />
 
-      {/* Единица */}
       <select
         value={row.unit}
         disabled={disabled}

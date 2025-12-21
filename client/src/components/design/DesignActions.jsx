@@ -33,7 +33,7 @@ const DesignActions = ({
     const payload = {
       materials: normalizeRows(),
       designerComment: String(designerComment || '').trim(),
-      mode, // 'save' | 'send'
+      mode,
     };
 
     if (payload.materials.length === 0) {

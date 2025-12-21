@@ -7,7 +7,6 @@ const DesignInfo = ({ item }) => {
     <section className={styles.wrapper}>
       <h2 className={styles.title}>{title}</h2>
 
-      {/* ФОТО */}
       <div className={styles.gallery}>
         {images.map((id) => (
           <img
@@ -19,13 +18,11 @@ const DesignInfo = ({ item }) => {
         ))}
       </div>
 
-      {/* ТИП */}
       <div className={styles.row}>
         <span className={styles.label}>Тип изделия:</span>
         <span>{type?.name || '—'}</span>
       </div>
 
-      {/* РАЗМЕРЫ */}
       <div className={styles.row}>
         <span className={styles.label}>Размеры:</span>
         <span>
@@ -34,7 +31,6 @@ const DesignInfo = ({ item }) => {
         </span>
       </div>
 
-      {/* КОММЕНТАРИЙ АДМИНИСТРАТОРА */}
       {comment && (
         <div className={styles.comment}>
           <span className={styles.label}>Комментарий администратора:</span>
