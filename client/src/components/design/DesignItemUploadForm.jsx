@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import axios from '../../api/axios';
 import styles from './DesignItemUploadForm.module.css';
 
@@ -18,6 +18,9 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (editingItem) {
@@ -32,20 +35,27 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
     } else {
       setForm(emptyForm);
       setFiles([]);
+      setSuccess('');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   }, [editingItem]);
 
   const handleChange = (e) => {
     setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
+    setSuccess('');
   };
 
   const handleFiles = (e) => {
     setFiles(Array.from(e.target.files));
+    setSuccess('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setLoading(true);
 
     try {
@@ -58,6 +68,8 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
             depth: form.depth || undefined,
           },
         });
+
+        setSuccess('Item successfully updated');
       } else {
         const fd = new FormData();
 
@@ -70,6 +82,13 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
         await axios.post('/design-items', fd, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
+        setSuccess('Item successfully created');
+        setForm(emptyForm);
+        setFiles([]);
+
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       }
 
       if (onSaved) onSaved();
@@ -87,12 +106,19 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
     <form className={styles.form} onSubmit={handleSubmit}>
       <h3>{isEdit ? 'Edit item' : 'New item'}</h3>
 
+      {success && (
+        <div className={styles.success}>
+          {success}
+        </div>
+      )}
+
       {error && <div className={styles.error}>{error}</div>}
 
       {!isEdit && (
         <label>
-          Photos *
+          Photos
           <input
+            ref={fileInputRef}
             type="file"
             multiple
             onChange={handleFiles}

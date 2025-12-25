@@ -1,10 +1,7 @@
-import express from 'express';
 import mongoose from 'mongoose';
 import { getBucket } from '../config/gridfs.js';
 
-const router = express.Router();
-
-router.get('/:id', async (req, res) => {
+export const getFileById = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -13,7 +10,6 @@ router.get('/:id', async (req, res) => {
     }
 
     const bucket = getBucket();
-
     const _id = new mongoose.Types.ObjectId(id);
 
     const files = await bucket.find({ _id }).toArray();
@@ -33,9 +29,7 @@ router.get('/:id', async (req, res) => {
     const downloadStream = bucket.openDownloadStream(_id);
     downloadStream.pipe(res);
   } catch (err) {
-    console.error(err);
+    console.error('Get file error:', err);
     res.status(500).json({ message: 'Failed to get file' });
   }
-});
-
-export default router;
+};

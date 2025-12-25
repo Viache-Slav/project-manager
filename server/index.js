@@ -7,9 +7,9 @@ import { initGridFS } from './config/gridfs.js';
 import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import trackRoutes from './routes/trackRoutes.js';
-import designItemRoutes from './routes/designItems.js';
-import productTypeRoutes from './routes/productTypes.js';
-import fileRoutes from './routes/files.js';
+import designItemRoutes from './routes/designItemsRoutes.js';
+import productTypeRoutes from './routes/productTypesRoutes.js';
+import fileRoutes from './routes/filesRoutes.js';
 
 dotenv.config();
 

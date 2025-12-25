@@ -168,3 +168,39 @@ export const updateDesignItem = async (req, res) => {
     res.status(500).json({ message: 'Failed to update item' });
   }
 };
+
+export const deleteDesignItem = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid item id' });
+    }
+
+    const item = await DesignItem.findById(id);
+
+    if (!item) {
+      return res.status(404).json({ message: 'Design item not found' });
+    }
+
+    const bucket = getBucket();
+
+    if (Array.isArray(item.images)) {
+      for (const fileId of item.images) {
+        try {
+          await bucket.delete(new mongoose.Types.ObjectId(fileId));
+        } catch (err) {
+          console.warn('Failed to delete image:', fileId);
+        }
+      }
+    }
+
+    await item.deleteOne();
+
+    res.json({ message: 'Design item deleted successfully' });
+  } catch (err) {
+    console.error('Delete design item error:', err);
+    res.status(500).json({ message: 'Failed to delete design item' });
+  }
+};
+
