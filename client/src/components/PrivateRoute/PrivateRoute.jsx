@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import axios from '../../api/axios';
 
-const PrivateRoute = ({ children }) => {
+const PrivateRoute = ({ children, roles }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -22,10 +22,17 @@ const PrivateRoute = ({ children }) => {
 
     if (loading) return <p>Loading...</p>;
 
-    if (!user) return <Navigate to="/" />;
+    if (!user) return <Navigate to="/" replace />;
 
-    if (!user.role && user.googleId) return <Navigate to="/choose-role" />;
-    if (user.status !== 'approved') return <Navigate to="/pending-approval" />;
+    if (!user.role && user.googleId) 
+        return <Navigate to="/choose-role" replace />;
+
+    if (user.status !== 'approved') 
+        return <Navigate to="/pending-approval" replace />;
+
+    if (roles && user.role !== 'admin' && !roles.includes(user.role)) {
+        return <Navigate to="/dashboard" replace />;
+    }
 
     return children;
 };

@@ -1,7 +1,21 @@
+import { useEffect, useState } from 'react';
+import axios from '../../api/axios';
 import styles from './designInfo.module.css';
 
 const DesignInfo = ({ item }) => {
-  const { title, type, images, dimensions, comment } = item;
+  const { title, type, images, dimensions, comment, _id } = item;
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    axios.get('/auth/user').then(res => setUser(res.data));
+  }, []);
+
+  const handleDeleteImage = async (imageId) => {
+    if (!confirm('Delete this image?')) return;
+
+    await axios.delete(`/design-items/${_id}/images/${imageId}`);
+    window.location.reload(); // позже заменим на setState
+  };
 
   return (
     <section className={styles.wrapper}>
@@ -9,12 +23,23 @@ const DesignInfo = ({ item }) => {
 
       <div className={styles.gallery}>
         {images.map((id) => (
-          <img
-            key={id}
-            src={`${import.meta.env.VITE_API_URL}/files/${id}`}
-            alt={title}
-            className={styles.image}
-          />
+          <div key={id} className={styles.imageWrapper}>
+            <img
+              src={`${import.meta.env.VITE_API_URL}/files/${id}`}
+              alt={title}
+              className={styles.image}
+            />
+
+            {['admin', 'designer'].includes(user?.role) && (
+              <button
+                className={styles.remove}
+                onClick={() => handleDeleteImage(id)}
+                title="Delete image"
+              >
+                ×
+              </button>
+            )}
+          </div>
         ))}
       </div>
 
