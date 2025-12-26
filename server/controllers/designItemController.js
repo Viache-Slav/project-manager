@@ -225,3 +225,36 @@ export const deleteDesignItem = async (req, res) => {
   }
 };
 
+export const deleteDesignItemImage = async (req, res) => {
+  try {
+    const { id, imageId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid item id' });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(imageId)) {
+      return res.status(400).json({ message: 'Invalid image id' });
+    }
+
+    const item = await DesignItem.findById(id);
+    if (!item) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+
+    const bucket = getBucket();
+
+    await bucket.delete(new mongoose.Types.ObjectId(imageId));
+
+    item.images = item.images.filter(
+      (img) => img.toString() !== imageId
+    );
+
+    await item.save();
+
+    res.json(item);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to delete image' });
+  }
+};

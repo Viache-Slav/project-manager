@@ -20,6 +20,15 @@ export const getPendingUsers = async (req, res) => {
   }
 };
 
+export const getRoles = async (req, res) => {
+  res.json([
+    'admin',
+    'designer',
+    'employee',
+  ]);
+};
+
+
 export const approveUser = async (req, res) => {
   const { id } = req.params;
   const { role } = req.body;

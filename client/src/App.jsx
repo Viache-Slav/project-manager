@@ -17,7 +17,11 @@ function App() {
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/choose-role" element={<ChooseRolePage />} />
           <Route path="/pending-approval" element={<PendingApprovalPage />} />
-          <Route path="/design-items/:id" element={ <PrivateRoute> <DesignItemPage /> </PrivateRoute> } />
+          <Route 
+            path="/design-items/:id" 
+            element={ <PrivateRoute roles={['designer']}> 
+            <DesignItemPage /> </PrivateRoute> } 
+          />
         </Routes>
       </Router>
     </GoogleOAuthProvider>
