@@ -17,7 +17,7 @@ router.use(protect);
 router.post( '/', checkRole('admin'), uploadMemory.array('images', 10), createDesignItem);
 router.post( '/:id/calculation', protect, checkRole('designer', 'admin'), saveCalculation);
 
-router.patch( '/:id', protect, checkRole('admin'), updateDesignItem);
+router.patch( '/:id', protect, checkRole('admin'), uploadMemory.array('images', 10), updateDesignItem);
 
 router.delete( '/:id', checkRole('admin'), deleteDesignItem);
 

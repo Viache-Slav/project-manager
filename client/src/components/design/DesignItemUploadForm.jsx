@@ -32,6 +32,10 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
         depth: editingItem.dimensions?.depth || '',
         comment: editingItem.comment || '',
       });
+      setFiles([]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     } else {
       setForm(emptyForm);
       setFiles([]);
@@ -48,8 +52,10 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
   };
 
   const handleFiles = (e) => {
-    setFiles(Array.from(e.target.files));
-    setSuccess('');
+    setFiles((prev) => [
+      ...prev,
+      ...Array.from(e.target.files),
+    ]);
   };
 
   const handleSubmit = async (e) => {
@@ -59,26 +65,32 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
     setLoading(true);
 
     try {
+      const fd = new FormData();
+
+      Object.entries(form).forEach(([k, v]) => {
+        if (v !== '') fd.append(k, v);
+      });
+
+      fd.append(
+        'dimensions',
+        JSON.stringify({
+          width: form.width || undefined,
+          height: form.height || undefined,
+          depth: form.depth || undefined,
+        })
+      );
+
+      files.forEach((f) => fd.append('images', f));
+
       if (isEdit) {
-        await axios.patch(`/design-items/${editingItem._id}`, {
-          ...form,
-          dimensions: {
-            width: form.width || undefined,
-            height: form.height || undefined,
-            depth: form.depth || undefined,
-          },
+        await axios.patch(
+          `/design-items/${editingItem._id}`,
+          fd,
+          { headers: { 'Content-Type': 'multipart/form-data' }
         });
 
         setSuccess('Item successfully updated');
       } else {
-        const fd = new FormData();
-
-        files.forEach((f) => fd.append('images', f));
-
-        Object.entries(form).forEach(([k, v]) => {
-          if (v !== '') fd.append(k, v);
-        });
-
         await axios.post('/design-items', fd, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });
@@ -114,18 +126,16 @@ const DesignItemUploadForm = ({ editingItem, onSaved, onCancel }) => {
 
       {error && <div className={styles.error}>{error}</div>}
 
-      {!isEdit && (
-        <label>
-          Photos
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            onChange={handleFiles}
-            required
-          />
-        </label>
-      )}
+      <label>
+        {isEdit ? 'Add photos' : 'Photos'}
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          onChange={handleFiles}
+          required={!isEdit}
+        />
+      </label>
 
       <label>
         Title {isEdit ? '' : '*'}
