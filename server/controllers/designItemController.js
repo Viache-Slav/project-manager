@@ -161,6 +161,27 @@ export const updateDesignItem = async (req, res) => {
       if (productType) item.type = productType._id;
     }
 
+    if (req.files && req.files.length > 0) {
+      const bucket = getBucket();
+
+      for (const file of req.files) {
+        const uploadStream = bucket.openUploadStream(file.originalname, {
+          contentType: file.mimetype,
+          metadata: { uploadedBy: req.user._id },
+        });
+
+        uploadStream.end(file.buffer);
+
+        await new Promise((resolve, reject) => {
+          uploadStream.on('finish', () => {
+            item.images.push(uploadStream.id);
+            resolve();
+          });
+          uploadStream.on('error', reject);
+        });
+      }
+    }
+
     await item.save();
     res.json(item);
   } catch (err) {
