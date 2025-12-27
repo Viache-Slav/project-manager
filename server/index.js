@@ -11,6 +11,7 @@ import designItemRoutes from './routes/designItemsRoutes.js';
 import productTypeRoutes from './routes/productTypesRoutes.js';
 import fileRoutes from './routes/filesRoutes.js';
 import materialRoutes from './routes/materialRoutes.js';
+import materialCategoriesRoutes from './routes/materialCategoriesRoutes.js';
 
 dotenv.config();
 
@@ -46,6 +47,7 @@ app.use('/api/design-items', designItemRoutes);
 app.use('/api/product-types', productTypeRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/materials', materialRoutes);
+app.use('/api/material-categories', materialCategoriesRoutes);
 
 app.get('/', (req, res) => {
   res.send('Server is running!');

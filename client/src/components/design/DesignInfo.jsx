@@ -14,7 +14,7 @@ const DesignInfo = ({ item }) => {
     if (!confirm('Delete this image?')) return;
 
     await axios.delete(`/design-items/${_id}/images/${imageId}`);
-    window.location.reload(); // позже заменим на setState
+    window.location.reload();
   };
 
   return (
@@ -44,12 +44,12 @@ const DesignInfo = ({ item }) => {
       </div>
 
       <div className={styles.row}>
-        <span className={styles.label}>Тип изделия:</span>
+        <span className={styles.label}>Product type:</span>
         <span>{type?.name || '—'}</span>
       </div>
 
       <div className={styles.row}>
-        <span className={styles.label}>Размеры:</span>
+        <span className={styles.label}>Dimensions:</span>
         <span>
           {dimensions.width} × {dimensions.height}
           {dimensions.depth ? ` × ${dimensions.depth}` : ''}
@@ -58,7 +58,7 @@ const DesignInfo = ({ item }) => {
 
       {comment && (
         <div className={styles.comment}>
-          <span className={styles.label}>Комментарий администратора:</span>
+          <span className={styles.label}>Comment:</span>
           <p>{comment}</p>
         </div>
       )}

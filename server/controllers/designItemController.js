@@ -93,7 +93,7 @@ export const saveCalculation = async (req, res) => {
       return res.status(404).json({ message: 'Design item not found' });
     }
 
-    if (item.status !== 'submitted') {
+    if (item.status === 'approved') {
       return res.status(400).json({ message: 'Editing not allowed' });
     }
 
