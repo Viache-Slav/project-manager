@@ -1,24 +1,107 @@
 .wrapper {
-  border: 1px solid #ddd;
+  border: 1px solid #2a2a2a;
   padding: 16px;
-  border-radius: 6px;
+  border-radius: 8px;
   margin-bottom: 20px;
+  background: #1e1e1e;
+}
+
+.group {
+  margin-bottom: 16px;
+}
+
+.groupTitle {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 6px;
+  text-transform: capitalize;
+  color: #fff;
+}
+
+.fixedRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  background: #252525;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #eaeaea;
+}
+
+.fixedRow span {
+  flex: 1;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.actions button {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #3a3a3a;
+  background: #2b2b2b;
+  color: #fff;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.actions button:hover {
+  background: #3a3a3a;
+}
+
+.actions button:last-child {
+  color: #ff6b6b;
+  border-color: #ff6b6b33;
 }
 
 .row {
   display: grid;
-  grid-template-columns: 1fr 120px 80px auto;
+  grid-template-columns: 1fr 1fr 90px 90px;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
-.remove {
-  background: transparent;
-  border: none;
-  color: red;
-  cursor: pointer;
+.row input,
+.row select {
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: #fff;
+}
+
+.row input::placeholder {
+  color: #888;
 }
 
 .add {
-  margin-top: 10px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: #2b2b2b;
+  border: 1px dashed #555;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.add:hover {
+  background: #3a3a3a;
+}
+
+.fix {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #1f6feb;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.fix:hover {
+  background: #388bfd;
 }
