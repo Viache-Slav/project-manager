@@ -27,12 +27,12 @@ const DesignItemPage = () => {
       setMaterials(
         data.calculation.materials.map((m) => ({
           id: crypto.randomUUID(),
-          materialId: m.material,
-          materialName: m.materialName || '',
+          materialId: m.material._id,
+          materialName: m.material.name,
           quantity: m.amount,
           unit: m.unit,
-          categoryName: m.categoryName || '',
-          categoryId: m.categoryId || '',
+          categoryName: m.material.category?.name || '',
+          categoryId: m.material.category?._id || '',
         }))
       );
     }

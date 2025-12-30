@@ -1,33 +1,83 @@
 .wrapper {
-  border: 1px solid #ddd;
+  margin-top: 16px;
   padding: 16px;
-  border-radius: 6px;
-  margin-bottom: 20px;
+ background: #1e1e1e;
+  border-radius: 12px;
 }
 
-.textarea {
+.wrapper h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+textarea {
   width: 100%;
-  min-height: 120px;
+  min-height: 80px;
   resize: vertical;
-  margin-top: 8px;
-  padding: 10px;
+  padding: 10px 12px;
+
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+
+  color: #fff;
+  font-size: 14px;
+}
+
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .actions {
+  margin-top: 12px;
   display: flex;
   gap: 10px;
-  margin-top: 12px;
+  flex-wrap: wrap;
 }
 
-.primary {
-  font-weight: 600;
+.actions button {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.notice {
-  margin-top: 10px;
+.actions button:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
-.locked {
-  margin-top: 10px;
-  opacity: 0.8;
+.actions button:active {
+  transform: translateY(1px);
+}
+
+.actions button.approve {
+  background: #2e7dff;
+  border-color: #2e7dff;
+}
+
+.actions button.approve:hover {
+  background: #1f6fff;
+}
+
+.actions button.secondary {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.actions button.warning {
+  background: rgba(255, 193, 7, 0.15);
+  border-color: rgba(255, 193, 7, 0.35);
+}
+
+.actions button.warning:hover {
+  background: rgba(255, 193, 7, 0.25);
 }
