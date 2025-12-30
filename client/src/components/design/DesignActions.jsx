@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import axios from '../../api/axios';
 import styles from './designActions.module.css';
 
@@ -9,10 +10,21 @@ const DesignActions = ({
   setDesignerComment,
   onUpdated,
 }) => {
-  const disabled = status !== 'submitted';
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    axios.get('/auth/user').then((res) => setUser(res.data));
+  }, []);
+
+  const isAdmin = user?.role === 'admin';
+  const isSubmitted = status === 'submitted';
+
+  const canSave = !isAdmin && isSubmitted;
+  const canSendToApprove = isSubmitted;
+  const canAdminActions = isAdmin && status === 'to_approve';
 
   const normalizeMaterials = () =>
-    materials
+    (materials || [])
       .filter(
         (m) =>
           m.materialId &&
@@ -29,7 +41,7 @@ const DesignActions = ({
     const payload = normalizeMaterials();
 
     if (!payload.length) {
-      alert('Добавь хотя бы один материал с количеством');
+      alert('Add at least one material with quantity');
       return;
     }
 
@@ -43,13 +55,14 @@ const DesignActions = ({
     );
 
     alert('Saved');
+    onUpdated?.();
   };
 
   const submit = async () => {
     const payload = normalizeMaterials();
 
     if (!payload.length) {
-      alert('Добавь хотя бы один материал с количеством');
+      alert('Add at least one material with quantity');
       return;
     }
 
@@ -63,28 +76,68 @@ const DesignActions = ({
     );
 
     alert('Sent to approve');
-    onUpdated();
+    onUpdated?.();
   };
 
-  if (disabled) return null;
+  const returnToSubmitted = async () => {
+    await axios.post(
+      `/design-items/${designItemId}/return`
+    );
+
+    alert('Returned to recalculation');
+    onUpdated?.();
+  };
+
+  const approve = async () => {
+    await axios.post(
+      `/design-items/${designItemId}/approve`
+    );
+
+    alert('Approved');
+    onUpdated?.();
+  };
+
+  if (!user) return null;
 
   return (
     <div className={styles.wrapper}>
-      <h4>Comment</h4>
-
-      <textarea
-        value={designerComment}
-        onChange={(e) =>
-          setDesignerComment(e.target.value)
-        }
-        placeholder="Комментарий дизайнера"
-      />
+      {isSubmitted && !isAdmin && (
+        <>
+          <h4>Comment</h4>
+          <textarea
+            value={designerComment}
+            onChange={(e) =>
+              setDesignerComment(e.target.value)
+            }
+            placeholder="Comment"
+          />
+        </>
+      )}
 
       <div className={styles.actions}>
-        <button onClick={save}>Save</button>
-        <button onClick={submit}>
-          Send to approve
-        </button>
+        {canSave && (
+          <button onClick={save}>
+            Save
+          </button>
+        )}
+
+        {canSendToApprove && (
+          <button onClick={submit}>
+            Send to approve
+          </button>
+        )}
+
+        {canAdminActions && (
+          <>
+            <button onClick={returnToSubmitted}>
+              Send to recalculation
+            </button>
+
+            <button onClick={approve}>
+              Approve
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

@@ -74,7 +74,12 @@ export const createDesignItem = async (req, res) => {
 };
 
 export const getDesignItemById = async (req, res) => {
-  const item = await DesignItem.findById(req.params.id).populate('type');
+  const item = await DesignItem.findById(req.params.id)
+    .populate('type')
+    .populate({
+      path: 'calculation.materials.material',
+      populate: { path: 'category' },})
+    .sort({ createdAt: -1 });
 
   if (!item) {
     return res.status(404).json({ message: 'Design item not found' });
@@ -258,3 +263,38 @@ export const deleteDesignItemImage = async (req, res) => {
     res.status(500).json({ message: 'Failed to delete image' });
   }
 };
+
+export const approveCalculation = async (req, res) => {
+  const item = await DesignItem.findById(req.params.id);
+
+  if (!item) {
+    return res.status(404).json({ message: 'Item not found' });
+  }
+
+  if (item.status !== 'to_approve') {
+    return res.status(400).json({ message: 'Invalid status' });
+  }
+
+  item.status = 'approved';
+  await item.save();
+
+  res.json(item);
+};
+
+export const returnToSubmitted = async (req, res) => {
+  const item = await DesignItem.findById(req.params.id);
+
+  if (!item) {
+    return res.status(404).json({ message: 'Item not found' });
+  }
+
+  if (item.status !== 'to_approve') {
+    return res.status(400).json({ message: 'Invalid status' });
+  }
+
+  item.status = 'submitted';
+  await item.save();
+
+  res.json(item);
+};
+
