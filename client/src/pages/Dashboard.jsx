@@ -7,6 +7,7 @@ import TrackManager from '../components/track/TrackManager';
 import DesignCatalog from '../components/design/DesignCatalog';
 import AccordionSection from '../components/ui/AccordionSection';
 import DesignItemUploadForm from '../components/design/DesignItemUploadForm';
+import MaterialsOverview from '../components/materials/MaterialsOverview';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -74,6 +75,11 @@ const Dashboard = () => {
       <AccordionSection title="Upload design item">
         <DesignItemUploadForm onCreated={reloadProductsRef.current} />
       </AccordionSection>
+
+      <AccordionSection title="Materials">
+        <MaterialsOverview />
+      </AccordionSection>
+
 
       <AccordionSection title="Catalog">
         <DesignCatalog />
