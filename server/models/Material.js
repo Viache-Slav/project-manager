@@ -10,14 +10,19 @@ const materialSchema = new mongoose.Schema(
 
     unit: {
       type: String,
-      required: true,
-      default: 'pcs',
+      required: false,
+      default: null,
     },
 
     price: {
       type: Number,
       required: true,
       default: 0,
+    },
+
+    quantity: {
+      type: Number,
+      default: null,
     },
 
     category: {

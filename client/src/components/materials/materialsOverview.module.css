@@ -3,7 +3,43 @@
 }
 
 .title {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.filter {
   margin-bottom: 12px;
+}
+
+.filter select {
+  margin-left: 8px;
+  padding: 6px 8px;
+  background-color: #1e1e1e;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+}
+
+.filter select option {
+  background-color: #1e1e1e;
+  color: #fff;
+}
+
+.search {
+  margin-bottom: 12px;
+}
+
+.search input {
+  width: 100%;
+  padding: 6px 8px;
+  background-color: #1e1e1e;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+}
+
+.search input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .table {
@@ -14,10 +50,86 @@
 .table th,
 .table td {
   padding: 8px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   text-align: left;
 }
 
 .table th {
   font-weight: 600;
+  opacity: 0.9;
+}
+
+.price {
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.price:hover {
+  text-decoration: underline;
+}
+
+td input[type='number'] {
+  width: 80px;
+  background: #1e1e1e;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+.priceEdit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.priceEdit input {
+  width: 80px;
+  background: #1e1e1e;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+.save {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #2ecc71;
+  color: #000;
+  border: none;
+  cursor: pointer;
+}
+
+.save:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancel {
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: transparent;
+  color: #aaa;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.delete {
+  background: transparent;
+  border: 1px solid rgba(255, 0, 0, 0.4);
+  color: #ff5c5c;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete:hover {
+  background: rgba(255, 0, 0, 0.15);
 }

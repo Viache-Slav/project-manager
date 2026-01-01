@@ -2,6 +2,7 @@ import DesignItem from '../models/DesignItem.js';
 import ProductType from '../models/ProductType.js';
 import mongoose from 'mongoose';
 import { getBucket } from '../config/gridfs.js';
+import Material from '../models/Material.js';
 
 export const createDesignItem = async (req, res) => {
   try {
@@ -106,6 +107,23 @@ export const saveCalculation = async (req, res) => {
       return res.status(400).json({ message: 'Materials are required' });
     }
 
+    for (const m of materials) {
+      const materialId =
+        typeof m.material === 'string'
+          ? m.material
+          : m.material?._id;
+
+      if (!materialId || !m.unit) continue;
+
+      const materialDoc = await Material.findById(materialId);
+      if (!materialDoc) continue;
+
+      if (materialDoc.unit === null) {
+        materialDoc.unit = m.unit;
+        await materialDoc.save();
+      }
+    }
+
     item.calculation = {
       materials,
       comment,
@@ -117,13 +135,13 @@ export const saveCalculation = async (req, res) => {
     }
 
     await item.save();
-
     res.json(item);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Failed to save calculation' });
   }
 };
+
 
 export const getDesignItems = async (req, res) => {
   const items = await DesignItem.find()
