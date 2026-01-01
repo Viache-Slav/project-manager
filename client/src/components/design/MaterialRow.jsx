@@ -122,7 +122,6 @@ const MaterialRow = ({ row, categories, onChange }) => {
                       '/materials',
                       {
                         name: row.materialName,
-                        unit: row.unit || 'pcs',
                         categoryId: row.categoryId,
                       }
                     );
