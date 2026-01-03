@@ -84,7 +84,7 @@ const MaterialsOverview = () => {
       )
     );
 
-    setEditingPriceId(null);
+    setEditingId(null);
     setPriceDraft('');
   };
 

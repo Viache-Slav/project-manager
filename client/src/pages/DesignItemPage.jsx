@@ -14,6 +14,7 @@ const DesignItemPage = () => {
   const [item, setItem] = useState(null);
   const [materials, setMaterials] = useState([]);
   const [designerComment, setDesignerComment] = useState('');
+  const [calculation, setCalculation] = useState(null);
 
   useEffect(() => {
     loadItem();
@@ -27,18 +28,33 @@ const DesignItemPage = () => {
       setMaterials(
         data.calculation.materials.map((m) => ({
           id: crypto.randomUUID(),
-          materialId: m.material._id,
-          materialName: m.material.name,
+          materialId: m.material?._id || '',
+          materialName: m.material?.name || '',
           quantity: m.amount,
           unit: m.unit,
-          categoryName: m.material.category?.name || '',
-          categoryId: m.material.category?._id || '',
+          categoryName: m.material?.category?.name || '',
+          categoryId: m.material?.category?._id || '',
         }))
       );
+    } else {
+      setMaterials([]);
     }
 
     if (data.calculation?.comment) {
       setDesignerComment(data.calculation.comment);
+    } else {
+      setDesignerComment('');
+    }
+
+    if (data.status === 'to_approve' || data.status === 'approved') {
+      try {
+        const { data: calc } = await axios.get(`/design-items/${id}/calculation`);
+        setCalculation(calc);
+      } catch (e) {
+        setCalculation(null);
+      }
+    } else {
+      setCalculation(null);
     }
   };
 
@@ -55,6 +71,8 @@ const DesignItemPage = () => {
           status={item.status}
           materials={materials}
           setMaterials={setMaterials}
+          calculation={calculation}
+          onUpdated={loadItem}
         />
 
         <DesignActions
@@ -64,6 +82,7 @@ const DesignItemPage = () => {
           designerComment={designerComment}
           setDesignerComment={setDesignerComment}
           onUpdated={loadItem}
+          calculation={calculation}
         />
       </AccordionSection>
     </>

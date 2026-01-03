@@ -282,23 +282,6 @@ export const deleteDesignItemImage = async (req, res) => {
   }
 };
 
-export const approveCalculation = async (req, res) => {
-  const item = await DesignItem.findById(req.params.id);
-
-  if (!item) {
-    return res.status(404).json({ message: 'Item not found' });
-  }
-
-  if (item.status !== 'to_approve') {
-    return res.status(400).json({ message: 'Invalid status' });
-  }
-
-  item.status = 'approved';
-  await item.save();
-
-  res.json(item);
-};
-
 export const returnToSubmitted = async (req, res) => {
   const item = await DesignItem.findById(req.params.id);
 
@@ -316,3 +299,103 @@ export const returnToSubmitted = async (req, res) => {
   res.json(item);
 };
 
+export const getCalculation = async (req, res) => {
+  const { id } = req.params;
+
+  const item = await DesignItem.findById(id).populate({
+    path: 'calculation.materials.material',
+    populate: { path: 'category' },
+  });
+
+  if (!item) {
+    return res.status(404).json({ message: 'Design item not found' });
+  }
+
+  const materials = item.calculation?.materials || [];
+
+  let totalCost = 0;
+  let hasMissingPrices = false;
+  let hasZeroPrices = false;
+
+  const grouped = {};
+
+  for (const row of materials) {
+    const material = row.material;
+    if (!material) continue;
+
+    const price = material.price;
+    const amount = Number(row.amount);
+    const unit = row.unit || material.unit;
+
+    let total = null;
+
+    if (price === null || price === undefined) {
+      hasMissingPrices = true;
+    } else {
+      if (price === 0) hasZeroPrices = true;
+      total = amount * price;
+      totalCost += total;
+    }
+
+    const categoryName = material.category?.name || 'other';
+
+    grouped[categoryName] ||= [];
+    grouped[categoryName].push({
+      materialId: material._id,
+      name: material.name,
+      unit,
+      amount,
+      price: price ?? null,
+      total,
+    });
+  }
+
+  if (hasMissingPrices) totalCost = null;
+
+  res.json({
+    grouped,
+    summary: {
+      totalCost,
+      hasMissingPrices,
+      hasZeroPrices,
+    },
+  });
+};
+
+export const approveCalculation = async (req, res) => {
+  const item = await DesignItem.findById(req.params.id).populate({
+    path: 'calculation.materials.material',
+  });
+
+  if (!item) {
+    return res.status(404).json({ message: 'Item not found' });
+  }
+
+  if (item.status !== 'to_approve') {
+    return res.status(400).json({ message: 'Invalid status' });
+  }
+
+  const materials = item.calculation?.materials || [];
+
+  let hasMissingPrices = false;
+  let hasZeroPrices = false;
+
+  for (const m of materials) {
+    const price = m.material?.price;
+    if (price === null || price === undefined) hasMissingPrices = true;
+    if (price === 0) hasZeroPrices = true;
+  }
+
+  if (hasMissingPrices || hasZeroPrices) {
+    return res.status(400).json({
+      message: 'Cannot approve: invalid prices',
+      hasMissingPrices,
+      hasZeroPrices,
+    });
+  }
+
+  item.status = 'approved';
+  await item.save();
+
+  res.json(item);
+};
