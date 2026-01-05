@@ -1,6 +1,6 @@
 import express from 'express';
 import { 
-  createDesignItem, getCalculation,
+  createDesignItem, getCalculation, updateExpenses,
   getDesignItemById, saveCalculation, getDesignItems, updateDesignItem,
   deleteDesignItem, deleteDesignItemImage, approveCalculation, returnToSubmitted
  } from '../controllers/designItemController.js';
@@ -25,5 +25,7 @@ router.delete( '/:id/images/:imageId', protect, checkRole('designer'), deleteDes
 router.get('/', checkRole('designer'), getDesignItems);
 router.get('/:id', protect, getDesignItemById);
 router.get('/:id/calculation', protect, checkRole('admin'), getCalculation);
+
+router.put( '/:id/expenses', protect, checkRole('admin'), updateExpenses );
 
 export default router;

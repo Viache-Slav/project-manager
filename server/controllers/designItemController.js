@@ -125,6 +125,7 @@ export const saveCalculation = async (req, res) => {
     }
 
     item.calculation = {
+      ...item.calculation,
       materials,
       comment,
       calculatedAt: new Date(),
@@ -312,8 +313,10 @@ export const getCalculation = async (req, res) => {
   }
 
   const materials = item.calculation?.materials || [];
+  const expenses = item.calculation?.expenses || [];
 
-  let totalCost = 0;
+  let materialsCost = 0;
+  let expensesCost = 0;
   let hasMissingPrices = false;
   let hasZeroPrices = false;
 
@@ -334,7 +337,7 @@ export const getCalculation = async (req, res) => {
     } else {
       if (price === 0) hasZeroPrices = true;
       total = amount * price;
-      totalCost += total;
+      materialsCost += total;
     }
 
     const categoryName = material.category?.name || 'other';
@@ -350,11 +353,21 @@ export const getCalculation = async (req, res) => {
     });
   }
 
-  if (hasMissingPrices) totalCost = null;
+  for (const e of expenses) {
+    if (typeof e.total === 'number') {
+      expensesCost += e.total;
+    }
+  }
+
+  const totalCost = hasMissingPrices
+    ? null
+    : materialsCost + expensesCost;
 
   res.json({
     grouped,
     summary: {
+      materialsCost,
+      expensesCost,
       totalCost,
       hasMissingPrices,
       hasZeroPrices,
@@ -398,4 +411,35 @@ export const approveCalculation = async (req, res) => {
   await item.save();
 
   res.json(item);
+};
+
+export const updateExpenses = async (req, res) => {
+  const { id } = req.params;
+  const expenses = req.body;
+
+  if (!Array.isArray(expenses)) {
+    return res.status(400).json({ message: 'Invalid expenses data' });
+  }
+
+  const item = await DesignItem.findById(id);
+  if (!item) {
+    return res.status(404).json({ message: 'Item not found' });
+  }
+
+  item.calculation ||= {};
+
+  item.calculation.expenses = expenses.map((e) => ({
+    type: e.type,
+    title: e.title,
+    amount: Number(e.amount || 1),
+    unit: e.unit || null,
+    price: Number(e.price || 0),
+    total: Number(e.amount || 1) * Number(e.price || 0),
+  }));
+
+  item.calculation.calculatedAt = new Date();
+
+  await item.save();
+
+  res.json(item.calculation.expenses);
 };

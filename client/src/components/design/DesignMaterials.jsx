@@ -306,7 +306,7 @@ const DesignMaterials = ({
             </span>
             <span className={styles.summaryValue}>
               {formatMoney(
-                calculation.summary?.totalCost ?? null
+                calculation.summary?.materialsCost ?? null
               )}
             </span>
           </div>
