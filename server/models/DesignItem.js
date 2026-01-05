@@ -44,7 +44,6 @@ const designItemSchema = new Schema(
       trim: true,
     },
 
-    // ✅ РАСЧЁТ ХРАНИТСЯ ЗДЕСЬ
     calculation: {
       materials: [
         {
@@ -63,6 +62,43 @@ const designItemSchema = new Schema(
           },
         },
       ],
+
+      expenses: [
+        {
+          type: {
+            type: String,
+            enum: ['labor', 'service', 'other'],
+            required: true,
+          },
+
+          title: {
+            type: String,
+            required: true,
+            trim: true,
+          },
+
+          amount: {
+            type: Number,
+            default: 1,
+          },
+
+          unit: {
+            type: String,
+            default: null,
+          },
+
+          price: {
+            type: Number,
+            required: true,
+          },
+
+          total: {
+            type: Number,
+            required: true,
+          },
+        },
+      ],
+      
       comment: {
         type: String,
         trim: true,

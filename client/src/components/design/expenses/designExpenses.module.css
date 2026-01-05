@@ -1,0 +1,41 @@
+.wrapper {
+  margin-top: 16px;
+}
+
+.title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  opacity: 0.85;
+}
+
+.empty {
+  opacity: 0.6;
+  padding: 6px 0;
+}
+
+.item {
+  background: var(--card-bg, #1e1e1e);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.name {
+  font-weight: 500;
+}
+
+.line {
+  margin-top: 4px;
+  opacity: 0.85;
+}
+
+.summary {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-weight: 600;
+}
+
+.button {
+  margin-top: 8px;
+}

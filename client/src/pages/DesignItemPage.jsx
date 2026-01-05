@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../api/axios';
@@ -6,6 +5,9 @@ import axios from '../api/axios';
 import DesignInfo from '../components/design/DesignInfo';
 import DesignMaterials from '../components/design/DesignMaterials';
 import DesignActions from '../components/design/DesignActions';
+import DesignExpensesEditor from '../components/design/expenses/DesignExpensesEditor';
+import DesignSummary from '../components/design/summary/DesignSummary';
+import DesignExpenses from '../components/design/expenses/DesignExpenses';
 import AccordionSection from '../components/ui/AccordionSection';
 
 const DesignItemPage = () => {
@@ -15,10 +17,18 @@ const DesignItemPage = () => {
   const [materials, setMaterials] = useState([]);
   const [designerComment, setDesignerComment] = useState('');
   const [calculation, setCalculation] = useState(null);
+  const [user, setUser] = useState(null);
+  const [showExpensesEditor, setShowExpensesEditor] = useState(false);
 
   useEffect(() => {
-    loadItem();
+    axios.get('/auth/user').then(res => setUser(res.data));
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      loadItem();
+    }
+  }, [user]);
 
   const loadItem = async () => {
     const { data } = await axios.get(`/design-items/${id}`);
@@ -40,17 +50,18 @@ const DesignItemPage = () => {
       setMaterials([]);
     }
 
-    if (data.calculation?.comment) {
-      setDesignerComment(data.calculation.comment);
-    } else {
-      setDesignerComment('');
-    }
+    setDesignerComment(data.calculation?.comment || '');
 
-    if (data.status === 'to_approve' || data.status === 'approved') {
+    if (
+      user?.role === 'admin' &&
+      (data.status === 'to_approve' || data.status === 'approved')
+    ) {
       try {
-        const { data: calc } = await axios.get(`/design-items/${id}/calculation`);
+        const { data: calc } = await axios.get(
+          `/design-items/${id}/calculation`
+        );
         setCalculation(calc);
-      } catch (e) {
+      } catch {
         setCalculation(null);
       }
     } else {
@@ -62,11 +73,11 @@ const DesignItemPage = () => {
 
   return (
     <>
-      <AccordionSection title="Основная информация" defaultOpen>
+      <AccordionSection title="Basic information" defaultOpen>
         <DesignInfo item={item} />
       </AccordionSection>
 
-      <AccordionSection title="Расчёт материалов">
+      <AccordionSection title="Calculation of materials">
         <DesignMaterials
           status={item.status}
           materials={materials}
@@ -74,6 +85,39 @@ const DesignItemPage = () => {
           calculation={calculation}
           onUpdated={loadItem}
         />
+
+        {item.calculation && (
+          <DesignExpenses
+            expenses={item.calculation.expenses}
+            expensesCost={calculation?.summary?.expensesCost}
+            isAdmin={user?.role === 'admin'}
+            onEdit={() => setShowExpensesEditor(true)}
+          />
+        )}
+
+        {showExpensesEditor && user?.role === 'admin' && (
+          <DesignExpensesEditor
+            designItemId={id}
+            expenses={item.calculation.expenses}
+            onSaved={() => {
+              setShowExpensesEditor(false);
+              loadItem();
+            }}
+          />
+        )}
+
+        <DesignSummary
+          calculation={calculation}
+          status={item.status}
+          user={user}
+        />
+
+        {designerComment && (
+          <div style={{ marginTop: 16 }}>
+            <strong>Designer comment:</strong>
+            <div>{designerComment}</div>
+          </div>
+        )}
 
         <DesignActions
           designItemId={id}
