@@ -389,14 +389,34 @@ export const approveCalculation = async (req, res) => {
   }
 
   const materials = item.calculation?.materials || [];
+  const expenses = item.calculation?.expenses || [];
 
   let hasMissingPrices = false;
   let hasZeroPrices = false;
 
+  let materialsCost = 0;
+  let expensesCost = 0;
+
   for (const m of materials) {
     const price = m.material?.price;
+
     if (price === null || price === undefined) hasMissingPrices = true;
     if (price === 0) hasZeroPrices = true;
+
+    const amount = Number(m.amount || 0);
+    const p = Number(price || 0);
+
+    materialsCost += amount * p;
+  }
+
+  for (const e of expenses) {
+    if (typeof e.total === 'number') {
+      expensesCost += e.total;
+    } else {
+      const amount = Number(e.amount || 1);
+      const price = Number(e.price || 0);
+      expensesCost += amount * price;
+    }
   }
 
   if (hasMissingPrices || hasZeroPrices) {
@@ -407,7 +427,14 @@ export const approveCalculation = async (req, res) => {
     });
   }
 
+  const totalCost = materialsCost + expensesCost;
+  const salePrice = Number((totalCost * 2).toFixed(2));
+
   item.status = 'approved';
+  item.salePrice = salePrice;
+  item.approvedAt = new Date();
+  item.salePriceUpdatedAt = new Date();
+
   await item.save();
 
   res.json(item);
@@ -442,4 +469,32 @@ export const updateExpenses = async (req, res) => {
   await item.save();
 
   res.json(item.calculation.expenses);
+};
+
+export const updateSalePrice = async (req, res) => {
+  const { id } = req.params;
+  const { salePrice } = req.body;
+
+  const num = Number(salePrice);
+
+  if (!Number.isFinite(num) || num <= 0) {
+    return res.status(400).json({ message: 'Invalid sale price' });
+  }
+
+  const item = await DesignItem.findById(id);
+
+  if (!item) {
+    return res.status(404).json({ message: 'Item not found' });
+  }
+
+  if (item.status !== 'approved') {
+    return res.status(400).json({ message: 'Item not approved' });
+  }
+
+  item.salePrice = Number(num.toFixed(2));
+  item.salePriceUpdatedAt = new Date();
+
+  await item.save();
+
+  res.json(item);
 };

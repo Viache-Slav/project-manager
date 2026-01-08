@@ -120,6 +120,7 @@ const DesignItemPage = () => {
         )}
 
         <DesignActions
+          item={item}
           designItemId={id}
           status={item.status}
           materials={materials}

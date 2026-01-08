@@ -114,6 +114,21 @@ const designItemSchema = new Schema(
       default: 'submitted',
     },
 
+    salePrice: {
+      type: Number,
+      default: null,
+    },
+
+    approvedAt: {
+      type: Date,
+      default: null,
+    },
+
+    salePriceUpdatedAt: {
+      type: Date,
+      default: null,
+    },
+
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: 'User',
