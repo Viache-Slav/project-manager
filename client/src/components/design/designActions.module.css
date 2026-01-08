@@ -81,3 +81,26 @@ textarea::placeholder {
 .actions button.warning:hover {
   background: rgba(255, 193, 7, 0.25);
 }
+
+.salePrice {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.salePrice input {
+  width: 160px;
+  padding: 8px 10px;
+
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+
+  color: #fff;
+  font-size: 14px;
+}
+
+.salePrice input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}

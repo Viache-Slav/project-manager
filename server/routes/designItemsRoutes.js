@@ -1,6 +1,6 @@
 import express from 'express';
 import { 
-  createDesignItem, getCalculation, updateExpenses,
+  createDesignItem, getCalculation, updateExpenses, updateSalePrice,
   getDesignItemById, saveCalculation, getDesignItems, updateDesignItem,
   deleteDesignItem, deleteDesignItemImage, approveCalculation, returnToSubmitted
  } from '../controllers/designItemController.js';
@@ -14,6 +14,7 @@ router.use(protect);
 router.post( '/', checkRole('admin'), uploadMemory.array('images', 10), createDesignItem);
 router.post( '/:id/calculation', protect, checkRole('designer'), saveCalculation);
 router.post( '/:id/approve', protect, checkRole('admin'), approveCalculation);
+router.put( '/:id/sale-price', protect, checkRole('admin'), updateSalePrice);
 router.post( '/:id/return', protect, checkRole('admin'), returnToSubmitted);
 
 

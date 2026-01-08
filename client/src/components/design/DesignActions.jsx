@@ -3,6 +3,7 @@ import axios from '../../api/axios';
 import styles from './designActions.module.css';
 
 const DesignActions = ({
+  item,
   designItemId,
   status,
   materials,
@@ -11,10 +12,20 @@ const DesignActions = ({
   onUpdated,
 }) => {
   const [user, setUser] = useState(null);
+  const [salePriceDraft, setSalePriceDraft] = useState('');
 
   useEffect(() => {
     axios.get('/auth/user').then((res) => setUser(res.data));
   }, []);
+
+  useEffect(() => {
+    if (user?.role === 'admin' && status === 'approved') {
+      const v = item?.salePrice;
+      setSalePriceDraft(
+        typeof v === 'number' ? String(v) : ''
+      );
+    }
+  }, [user, status, item?.salePrice]);
 
   const isAdmin = user?.role === 'admin';
   const isSubmitted = status === 'submitted';
@@ -96,11 +107,47 @@ const DesignActions = ({
     alert('Approved');
     onUpdated?.();
   };
+  const saveSalePrice = async () => {
+    const num = Number(salePriceDraft);
+
+    if (!Number.isFinite(num) || num <= 0) {
+      alert('Invalid sale price');
+      return;
+    }
+
+    await axios.put(
+      `/design-items/${designItemId}/sale-price`,
+      { salePrice: num }
+    );
+
+    alert('Sale price saved');
+    onUpdated?.();
+  };
 
   if (!user) return null;
 
   return (
     <div className={styles.wrapper}>
+      {isAdmin && status === 'approved' && (
+        <div className={styles.salePrice}>
+          <h4>Sale price</h4>
+
+          <input
+            type="number"
+            step="0.01"
+            value={salePriceDraft}
+            onChange={(e) => setSalePriceDraft(e.target.value)}
+            placeholder="Sale price"
+          />
+
+          <div style={{ marginTop: 8 }}>
+            <button onClick={saveSalePrice}>
+              Save price
+            </button>
+          </div>
+        </div>
+      )}
+      
       {isSubmitted && !isAdmin && (
         <>
           <h4>Comment</h4>
