@@ -86,7 +86,14 @@ export const getDesignItemById = async (req, res) => {
     return res.status(404).json({ message: 'Design item not found' });
   }
 
-  res.json(item);
+  const result = item.toObject();
+
+  if (req.user.role !== 'admin') {
+    delete result.salePrice;
+    delete result.salePriceUpdatedAt;
+  }
+
+  res.json(result);
 };
 
 export const saveCalculation = async (req, res) => {
