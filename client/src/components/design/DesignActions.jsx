@@ -32,7 +32,8 @@ const DesignActions = ({
 
   const canSave = !isAdmin && isSubmitted;
   const canSendToApprove = isSubmitted;
-  const canAdminActions = isAdmin && status === 'to_approve';
+  const canApprove = isAdmin && status === 'to_approve';
+  const canReturn = isAdmin && (status === 'to_approve' || status === 'approved');
 
   const normalizeMaterials = () =>
     (materials || [])
@@ -174,16 +175,16 @@ const DesignActions = ({
           </button>
         )}
 
-        {canAdminActions && (
-          <>
-            <button onClick={returnToSubmitted}>
-              Send to recalculation
-            </button>
+        {canReturn && (
+          <button onClick={returnToSubmitted}>
+            Send to recalculation
+          </button>
+        )}
 
-            <button onClick={approve}>
-              Approve
-            </button>
-          </>
+        {canApprove && (
+          <button onClick={approve}>
+            Approve
+          </button>
         )}
       </div>
     </div>

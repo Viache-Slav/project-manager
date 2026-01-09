@@ -37,6 +37,22 @@ const PublicDesignItems = () => {
           <div className={styles.price}>
             Price: <strong>{item.salePrice} zł</strong>
           </div>
+
+          {item.dimensions && (
+            <div className={styles.dimensions}>
+              Size:
+              {item.dimensions.width} × {item.dimensions.height}
+              {item.dimensions.depth
+                ? ` × ${item.dimensions.depth}`
+                : ''} cm
+            </div>
+          )}
+
+          {item.comment && (
+            <div className={styles.description}>
+              {item.comment}
+            </div>
+          )}
         </div>
       ))}
     </div>
