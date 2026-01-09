@@ -297,7 +297,7 @@ export const returnToSubmitted = async (req, res) => {
     return res.status(404).json({ message: 'Item not found' });
   }
 
-  if (item.status !== 'to_approve') {
+  if (!['to_approve', 'approved'].includes(item.status)) {
     return res.status(400).json({ message: 'Invalid status' });
   }
 
@@ -434,6 +434,12 @@ export const approveCalculation = async (req, res) => {
     });
   }
 
+  if (!item.comment || !item.comment.trim()) {
+    return res.status(400).json({
+      message: 'Description is required before approval',
+    });
+  }
+
   const totalCost = materialsCost + expensesCost;
   const salePrice = Number((totalCost * 2).toFixed(2));
 
@@ -516,6 +522,7 @@ export const getPublicDesignItems = async (req, res) => {
         images: 1,
         dimensions: 1,
         salePrice: 1,
+        comment: 1,
       })
       .sort({ createdAt: -1 });
 

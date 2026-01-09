@@ -34,3 +34,16 @@
 .price strong {
   font-weight: 600;
 }
+
+.dimensions {
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.description {
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  opacity: 0.9;
+}
