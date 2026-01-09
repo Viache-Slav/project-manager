@@ -505,3 +505,23 @@ export const updateSalePrice = async (req, res) => {
 
   res.json(item);
 };
+
+export const getPublicDesignItems = async (req, res) => {
+  try {
+    const items = await DesignItem.find({ status: 'approved' })
+      .populate('type')
+      .select({
+        title: 1,
+        type: 1,
+        images: 1,
+        dimensions: 1,
+        salePrice: 1,
+      })
+      .sort({ createdAt: -1 });
+
+    res.json(items);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to load public design items' });
+  }
+};

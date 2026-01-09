@@ -2,12 +2,15 @@ import express from 'express';
 import { 
   createDesignItem, getCalculation, updateExpenses, updateSalePrice,
   getDesignItemById, saveCalculation, getDesignItems, updateDesignItem,
-  deleteDesignItem, deleteDesignItemImage, approveCalculation, returnToSubmitted
+  deleteDesignItem, deleteDesignItemImage, approveCalculation, returnToSubmitted,
+  getPublicDesignItems
  } from '../controllers/designItemController.js';
 import { protect, checkRole } from '../middleware/protect.js';
 import { uploadMemory } from '../middleware/uploadMemory.js';
 
 const router = express.Router();
+
+router.get('/public/design-items', getPublicDesignItems);
 
 router.use(protect);
 
