@@ -47,3 +47,71 @@
   line-height: 1.4;
   opacity: 0.9;
 }
+
+.addButton {
+  margin-top: 12px;
+  padding: 8px 14px;
+  font-size: 13px;
+
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+.addButton:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.orderInfo {
+  margin-top: 24px;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.orderForm {
+  margin-top: 24px;
+  padding: 16px;
+
+  background: #1e1e1e;
+  border-radius: 12px;
+
+  display: grid;
+  gap: 10px;
+}
+
+.orderForm h4 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.orderForm input {
+  padding: 10px 12px;
+  border-radius: 8px;
+
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+
+  color: #fff;
+  font-size: 14px;
+}
+
+.submitButton {
+  margin-top: 6px;
+  padding: 10px 14px;
+
+  background: #2e7dff;
+  border: none;
+  border-radius: 8px;
+
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.submitButton:hover {
+  background: #1f6fff;
+}
