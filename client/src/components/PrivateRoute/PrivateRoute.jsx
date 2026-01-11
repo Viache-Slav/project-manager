@@ -30,6 +30,10 @@ const PrivateRoute = ({ children, roles }) => {
     if (user.status !== 'approved') 
         return <Navigate to="/pending-approval" replace />;
 
+    if (user.role === 'client') {
+        return <Navigate to="/" replace />;
+    }
+
     if (roles && user.role !== 'admin' && !roles.includes(user.role)) {
         return <Navigate to="/dashboard" replace />;
     }
