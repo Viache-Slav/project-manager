@@ -2,10 +2,16 @@ import { useEffect, useState } from 'react';
 import axios from '../../api/axios';
 import styles from './publicDesignItems.module.css';
 
+import ClientRegisterForm from '../public/ClientRegisterForm';
+import Modal from '../ui/Modal';
+
 const PublicDesignItems = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [orderItems, setOrderItems] = useState([]);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const isAuth = Boolean(localStorage.getItem('token'));
 
   const [customer, setCustomer] = useState({
     name: '',
@@ -20,11 +26,24 @@ const PublicDesignItems = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  useEffect(() => {
+    if (!isAuth) return;
 
-  if (!items.length) {
-    return <div>No products available</div>;
-  }
+    axios
+      .get('/auth/me')
+      .then((res) => {
+        const user = res.data;
+        setCustomer({
+          name: user.name || '',
+          email: user.email || '',
+          phone: user.phone || '',
+        });
+      })
+      .catch(() => {});
+  }, [isAuth]);
+
+  if (loading) return <div>Loading...</div>;
+  if (!items.length) return <div>No products available</div>;
 
   const addToOrder = (item) => {
     setOrderItems((prev) => {
@@ -58,8 +77,8 @@ const PublicDesignItems = () => {
       return;
     }
 
-    if (!customer.name || !customer.email || !customer.phone) {
-      alert('Fill all contact fields');
+    if (!isAuth) {
+      setShowAuthModal(true);
       return;
     }
 
@@ -70,13 +89,7 @@ const PublicDesignItems = () => {
       });
 
       alert('Order sent');
-
       setOrderItems([]);
-      setCustomer({
-        name: '',
-        email: '',
-        phone: '',
-      });
     } catch (err) {
       alert(
         err.response?.data?.message ||
@@ -104,29 +117,12 @@ const PublicDesignItems = () => {
             Price: <strong>{item.salePrice} zł</strong>
           </div>
 
-          {item.dimensions && (
-            <div className={styles.dimensions}>
-              Size:
-              {item.dimensions.width} × {item.dimensions.height}
-              {item.dimensions.depth
-                ? ` × ${item.dimensions.depth}`
-                : ''} cm
-            </div>
-          )}
-
-          {item.comment && (
-            <div className={styles.description}>
-              {item.comment}
-            </div>
-          )}
-
           <button
             className={styles.addButton}
             onClick={() => addToOrder(item)}
           >
             Add to order
           </button>
-
         </div>
       ))}
 
@@ -139,50 +135,44 @@ const PublicDesignItems = () => {
 
       {orderItems.length > 0 && (
         <div className={styles.orderForm}>
-          <h4>Contact details</h4>
+          {!isAuth && (
+            <button
+              className={styles.submitButton}
+              onClick={() => setShowAuthModal(true)}
+            >
+              Register to place order
+            </button>
+          )}
 
-          <input
-            placeholder="Name"
-            value={customer.name}
-            onChange={(e) =>
-              setCustomer({
-                ...customer,
-                name: e.target.value,
-              })
-            }
-          />
+          {isAuth && (
+            <>
+              <h4>Contact details</h4>
 
-          <input
-            placeholder="Email"
-            value={customer.email}
-            onChange={(e) =>
-              setCustomer({
-                ...customer,
-                email: e.target.value,
-              })
-            }
-          />
+              <div className={styles.customerInfo}>
+                <div><strong>Name:</strong> {customer.name}</div>
+                <div><strong>Email:</strong> {customer.email}</div>
+                <div><strong>Phone:</strong> {customer.phone}</div>
+              </div>
 
-          <input
-            placeholder="Phone"
-            value={customer.phone}
-            onChange={(e) =>
-              setCustomer({
-                ...customer,
-                phone: e.target.value,
-              })
-            }
-          />
-
-          <button
-            className={styles.submitButton}
-            onClick={submitOrder}
-          >
-            Place order
-          </button>
+              <button
+                className={styles.submitButton}
+                onClick={submitOrder}
+              >
+                Place order
+              </button>
+            </>
+          )}
         </div>
       )}
 
+      <Modal
+        open={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      >
+        <ClientRegisterForm
+          onSuccess={() => setShowAuthModal(false)}
+        />
+      </Modal>
     </div>
   );
 };

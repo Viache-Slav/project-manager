@@ -79,3 +79,50 @@ export const googleLogin = async (req, res) => {
     res.status(401).json({ message: 'Google token verification failed' });
   }
 };
+
+export const registerClient = async (req, res) => {
+  try {
+    const { name, email, phone, password } = req.body;
+
+    if (!name || !email || !phone || !password) {
+      return res.status(400).json({
+        message: 'Name, email, phone and password are required',
+      });
+    }
+
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(400).json({
+        message: 'User with this email already exists',
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      username: email,    
+      name,
+      email,
+      phone,
+      password: hashedPassword,
+      role: 'client',      
+      status: 'approved',  
+    });
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    res.status(201).json({
+      token,
+      message: 'Client registered successfully',
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: 'Client registration failed',
+    });
+  }
+};

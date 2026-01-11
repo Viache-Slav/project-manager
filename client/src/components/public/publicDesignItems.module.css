@@ -115,3 +115,11 @@
 .submitButton:hover {
   background: #1f6fff;
 }
+
+.customerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  color: #ddd;
+}
