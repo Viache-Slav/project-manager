@@ -8,6 +8,7 @@ import DesignCatalog from '../components/design/DesignCatalog';
 import AccordionSection from '../components/ui/AccordionSection';
 import DesignItemUploadForm from '../components/design/DesignItemUploadForm';
 import MaterialsOverview from '../components/materials/MaterialsOverview';
+import AdminOrders from '../components/orders/AdminOrders';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -83,6 +84,10 @@ const Dashboard = () => {
 
       <AccordionSection title="Catalog">
         <DesignCatalog />
+      </AccordionSection>
+
+      <AccordionSection title="Orders">
+        <AdminOrders />
       </AccordionSection>
 
       {user?.role === 'admin' && (
