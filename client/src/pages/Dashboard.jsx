@@ -9,6 +9,7 @@ import AccordionSection from '../components/ui/AccordionSection';
 import DesignItemUploadForm from '../components/design/DesignItemUploadForm';
 import MaterialsOverview from '../components/materials/MaterialsOverview';
 import AdminOrders from '../components/orders/AdminOrders';
+import CatalogImport from '../components/catalog-import/CatalogImport';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -81,6 +82,9 @@ const Dashboard = () => {
         <MaterialsOverview />
       </AccordionSection>
 
+      <AccordionSection title="Catalog import">
+        <CatalogImport />
+      </AccordionSection>
 
       <AccordionSection title="Catalog">
         <DesignCatalog />

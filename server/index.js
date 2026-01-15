@@ -13,6 +13,7 @@ import fileRoutes from './routes/filesRoutes.js';
 import materialRoutes from './routes/materialRoutes.js';
 import materialCategoriesRoutes from './routes/materialCategoriesRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import catalogImportRoutes from './routes/catalogImportRoutes.js';
 
 dotenv.config();
 
@@ -50,6 +51,7 @@ app.use('/api/files', fileRoutes);
 app.use('/api/materials', materialRoutes);
 app.use('/api/material-categories', materialCategoriesRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/catalog-import', catalogImportRoutes);
 
 app.get('/', (req, res) => {
   res.send('Server is running!');
