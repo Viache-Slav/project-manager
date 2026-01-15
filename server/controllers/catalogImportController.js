@@ -84,14 +84,12 @@ export const importDavisCatalog = async (req, res) => {
         return res.status(400).json({ message: 'Missing data or files' });
       }
 
-      // 1️⃣ ТЕХНИЧЕСКИЕ ДАННЫЕ (ZIP → PDF)
       const techZipStream = bucket
         .openDownloadStream(techZipId)
         .pipe(unzipper.Parse({ forceStream: true }));
 
       const techData = await parseTechPdfFromZip(techZipStream);
 
-      // 2️⃣ ИЗОБРАЖЕНИЯ (ZIP → JPG)
       const imagesZipStream = bucket
         .openDownloadStream(imagesZipId)
         .pipe(unzipper.Parse({ forceStream: true }));
