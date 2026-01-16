@@ -7,6 +7,7 @@ const DesignActions = ({
   designItemId,
   status,
   materials,
+  fabrics, 
   designerComment,
   setDesignerComment,
   onUpdated,
@@ -49,8 +50,24 @@ const DesignActions = ({
         unit: m.unit,
       }));
 
+  const normalizeFabrics = () =>
+    (fabrics || [])
+      .filter(
+        (f) =>
+          f &&
+          String(f.brand || '').trim() &&
+          String(f.collection || '').trim() &&
+          Number(f.meterage) > 0
+      )
+      .map((f) => ({
+        brand: String(f.brand).trim(),
+        collection: String(f.collection).trim(),
+        meterage: Number(f.meterage),
+      }));
+
   const save = async () => {
     const payload = normalizeMaterials();
+    const fabricsPayload = normalizeFabrics();
 
     if (!payload.length) {
       alert('Add at least one material with quantity');
@@ -61,6 +78,7 @@ const DesignActions = ({
       `/design-items/${designItemId}/calculation`,
       {
         materials: payload,
+        fabrics: fabricsPayload,
         comment: designerComment,
         mode: 'save',
       }
@@ -72,6 +90,7 @@ const DesignActions = ({
 
   const submit = async () => {
     const payload = normalizeMaterials();
+    const fabricsPayload = normalizeFabrics();
 
     if (!payload.length) {
       alert('Add at least one material with quantity');
@@ -82,6 +101,7 @@ const DesignActions = ({
       `/design-items/${designItemId}/calculation`,
       {
         materials: payload,
+        fabrics: fabricsPayload,
         comment: designerComment,
         mode: 'send',
       }
