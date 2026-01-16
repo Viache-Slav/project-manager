@@ -99,7 +99,7 @@ export const getDesignItemById = async (req, res) => {
 export const saveCalculation = async (req, res) => {
   try {
     const { id } = req.params;
-    const { materials, comment, mode } = req.body;
+    const { materials, fabrics, comment, mode } = req.body;
 
     const item = await DesignItem.findById(id);
     if (!item) {
@@ -140,6 +140,26 @@ export const saveCalculation = async (req, res) => {
 
     if (mode === 'send') {
       item.status = 'to_approve';
+    }
+
+    if (Array.isArray(fabrics)) {
+      const normalized = fabrics
+        .filter(
+          (f) =>
+            f &&
+            String(f.brand || '').trim() &&
+            String(f.collection || '').trim() &&
+            Number(f.meterage) > 0
+        )
+        .map((f) => ({
+          brand: String(f.brand).trim(),
+          collection: String(f.collection).trim(),
+          meterage: Number(f.meterage),
+        }));
+
+      item.fabricSelection = {
+        collections: normalized,
+      };
     }
 
     await item.save();
@@ -523,6 +543,7 @@ export const getPublicDesignItems = async (req, res) => {
         dimensions: 1,
         salePrice: 1,
         comment: 1,
+        fabricSelection: 1,
       })
       .sort({ createdAt: -1 });
 

@@ -44,6 +44,16 @@ const designItemSchema = new Schema(
       trim: true,
     },
 
+    fabricSelection: {
+      collections: [
+        {
+          brand: { type: String, trim: true },
+          collection: { type: String, trim: true },
+          meterage: { type: Number, min: 0 },
+        },
+      ],
+    },
+
     calculation: {
       materials: [
         {

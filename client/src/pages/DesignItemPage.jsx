@@ -9,12 +9,14 @@ import DesignExpensesEditor from '../components/design/expenses/DesignExpensesEd
 import DesignSummary from '../components/design/summary/DesignSummary';
 import DesignExpenses from '../components/design/expenses/DesignExpenses';
 import AccordionSection from '../components/ui/AccordionSection';
+import DesignFabrics from '../components/design/DesignFabrics';
 
 const DesignItemPage = () => {
   const { id } = useParams();
 
   const [item, setItem] = useState(null);
   const [materials, setMaterials] = useState([]);
+  const [fabrics, setFabrics] = useState([]);
   const [designerComment, setDesignerComment] = useState('');
   const [calculation, setCalculation] = useState(null);
   const [user, setUser] = useState(null);
@@ -25,9 +27,7 @@ const DesignItemPage = () => {
   }, []);
 
   useEffect(() => {
-    if (user) {
-      loadItem();
-    }
+    if (user) { loadItem();}
   }, [user]);
 
   const loadItem = async () => {
@@ -48,6 +48,20 @@ const DesignItemPage = () => {
       );
     } else {
       setMaterials([]);
+    }
+
+    if (data.calculation?.fabrics) {
+      setFabrics(
+        data.calculation.fabrics.map((f) => ({
+          id: crypto.randomUUID(),
+          brand: f.brand,
+          collection: f.collection,
+          meterage: f.meterage,
+          allowedForClient: f.allowedForClient ?? true,
+        }))
+      );
+    } else {
+      setFabrics([]);
     }
 
     setDesignerComment(data.calculation?.comment || '');
@@ -84,6 +98,12 @@ const DesignItemPage = () => {
           setMaterials={setMaterials}
           calculation={calculation}
           onUpdated={loadItem}
+        />
+
+        <DesignFabrics
+          status={item.status}
+          fabrics={fabrics}
+          setFabrics={setFabrics}
         />
 
         {item.calculation && (
@@ -124,6 +144,7 @@ const DesignItemPage = () => {
           designItemId={id}
           status={item.status}
           materials={materials}
+          fabrics={fabrics}  
           designerComment={designerComment}
           setDesignerComment={setDesignerComment}
           onUpdated={loadItem}

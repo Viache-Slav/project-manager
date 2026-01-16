@@ -70,4 +70,9 @@ const fabricSchema = new mongoose.Schema(
   }
 );
 
+fabricSchema.index(
+  { brand: 1, collection: 1, colorCode: 1 },
+  { unique: true }
+);
+
 export default mongoose.model('Fabric', fabricSchema);
