@@ -10,7 +10,7 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
 
   const [draft, setDraft] = useState({
     brand: 'Davis',
-    collection: '',
+    collectionName: '',
     pricePerMeter: 0,
     editingPrice: false,
   });
@@ -54,13 +54,13 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
   }, [collectionsByBrand, draft.brand]);
 
   const add = () => {
-    if (!draft.brand || !draft.collection) {
+    if (!draft.brand || !draft.collectionName) {
       alert('Select brand and collection');
       return;
     }
 
     const exists = (fabrics || []).some(
-      (x) => x.brand === draft.brand && x.collection === draft.collection
+      (x) => x.brand === draft.brand && x.collectionName === draft.collectionName
     );
     if (exists) {
       alert('This collection is already added');
@@ -72,14 +72,14 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
       {
         id: crypto.randomUUID(),
         brand: draft.brand,
-        collection: draft.collection,
+        collectionName: draft.collectionName,
         pricePerMeter: Number(draft.pricePerMeter) || 0,
       },
     ]);
 
     setDraft((prev) => ({
       ...prev,
-      collection: '',
+      collectionName: '',
       pricePerMeter: 0,
       editingPrice: false,
     }));
@@ -99,7 +99,7 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
 
     await axios.put('/fabrics/collection-price', {
       brand: row.brand,
-      collection: row.collection,
+      collectionName: row.collectionName,
       pricePerMeter: value,
     });
 
@@ -127,7 +127,7 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
                 <div key={f.id} className={styles.row}>
                   <div className={styles.left}>
                     <div className={styles.title}>
-                      {f.brand} / {f.collection}
+                      {f.brand} / {f.collectionName}
                     </div>
 
                     <div className={styles.sub}>
@@ -199,7 +199,7 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
                   onChange={(e) =>
                     setDraft({
                       brand: e.target.value,
-                      collection: '',
+                      collectionName: '',
                       pricePerMeter: 0,
                       editingPrice: false,
                     })
@@ -222,14 +222,14 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
               <label className={styles.label}>
                 Collection
                 <select
-                  value={draft.collection}
+                  value={draft.collectionName}
                   onChange={(e) => {
                     const name = e.target.value;
                     const col = collections.find((c) => c.name === name);
 
                     setDraft((prev) => ({
                       ...prev,
-                      collection: name,
+                      collectionName: name,
                       pricePerMeter: col?.pricePerMeter ?? 0,
                       editingPrice: (col?.pricePerMeter ?? 0) === 0,
                     }));
@@ -247,7 +247,7 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
                 </select>
               </label>
 
-              {draft.collection && (
+              {draft.collectionName && (
                 <label className={styles.label}>
                   Price per meter
 
@@ -269,7 +269,7 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
 
                         await axios.put('/fabrics/collection-price', {
                           brand: draft.brand,
-                          collection: draft.collection,
+                          collectionName: draft.collectionName,
                           pricePerMeter: value,
                         });
 

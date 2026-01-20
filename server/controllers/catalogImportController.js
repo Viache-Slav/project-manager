@@ -49,7 +49,7 @@ export const importDavisCatalog = async (req, res) => {
   const bucket = getBucket();
 
   let brand;
-  let collection;
+  let collectionName;
 
   let techZipId;
   let imagesZipId;
@@ -58,7 +58,7 @@ export const importDavisCatalog = async (req, res) => {
 
   busboy.on('field', (name, value) => {
     if (name === 'brand') brand = value;
-    if (name === 'collection') collection = value;
+    if (name === 'collectionName') collectionName = value;
   });
 
   busboy.on('file', (name, file, info) => {
@@ -80,7 +80,7 @@ export const importDavisCatalog = async (req, res) => {
     try {
       await Promise.all(uploads);
 
-      if (!brand || !collection || !techZipId || !imagesZipId) {
+      if (!brand || !collectionName || !techZipId || !imagesZipId) {
         return res.status(400).json({ message: 'Missing data or files' });
       }
 
@@ -115,9 +115,9 @@ export const importDavisCatalog = async (req, res) => {
         await new Promise((r) => imageUpload.on('finish', r));
 
         await Fabric.create({
-          name: collection,
+          name: collectionName,
           brand,
-          collection,
+          collectionName,
           colorName: colorCode,
           colorCode,
           ...techData,

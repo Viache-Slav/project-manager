@@ -48,7 +48,7 @@ const designItemSchema = new Schema(
       collections: [
         {
           brand: { type: String, trim: true },
-          collection: { type: String, trim: true },
+          collectionName: { type: String, trim: true },
           meterage: { type: Number, min: 0 },
         },
       ],

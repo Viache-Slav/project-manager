@@ -14,7 +14,7 @@ const fabricSchema = new mongoose.Schema(
       trim: true,
     },
 
-    collection: {
+    collectionName: {
       type: String,
       required: true,
       trim: true,
@@ -71,7 +71,7 @@ const fabricSchema = new mongoose.Schema(
 );
 
 fabricSchema.index(
-  { brand: 1, collection: 1, colorCode: 1 },
+  { brand: 1, collectionName: 1, colorCode: 1 },
   { unique: true }
 );
 
