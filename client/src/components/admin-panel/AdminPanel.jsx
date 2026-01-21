@@ -1,12 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from '../../api/axios';
-import styles from './AdminPanel.module.css';
-
-const roleLabels = {
-  admin: 'Admin (Leader)',
-  designer: 'Designer',
-  employee: 'Employee',
-};
+import AdminPanelView from './AdminPanelView';
 
 const AdminPanel = () => {
   const [pendingUsers, setPendingUsers] = useState([]);
@@ -20,10 +14,15 @@ const AdminPanel = () => {
 
   const fetchPendingUsers = async () => {
     try {
-      const { data } = await axios.get('/admin/pending-users');
+      const { data } = await axios.get(
+        '/admin/pending-users'
+      );
       setPendingUsers(data);
-    } catch (error) {
-      console.error('Error fetching pending users:', error);
+    } catch (err) {
+      console.error(
+        'Error fetching pending users:',
+        err
+      );
     }
   };
 
@@ -31,8 +30,11 @@ const AdminPanel = () => {
     try {
       const { data } = await axios.get('/admin/roles');
       setAvailableRoles(data);
-    } catch (error) {
-      console.error('Error fetching roles:', error);
+    } catch (err) {
+      console.error(
+        'Error fetching roles:',
+        err
+      );
     }
   };
 
@@ -44,87 +46,57 @@ const AdminPanel = () => {
   };
 
   const handleApprove = async (userId) => {
-    const user = pendingUsers.find(u => u._id === userId);
-    const selectedRole = selectedRoles[userId] || user.role;
+    const user = pendingUsers.find(
+      (u) => u._id === userId
+    );
+
+    const selectedRole =
+      selectedRoles[userId] || user?.role;
 
     if (!selectedRole) {
-      alert('Please select a role before approving!');
+      alert(
+        'Please select a role before approving!'
+      );
       return;
     }
 
     try {
-      await axios.patch(`/admin/users/${userId}/approve`, { role: selectedRole, });
+      await axios.patch(
+        `/admin/users/${userId}/approve`,
+        { role: selectedRole }
+      );
       fetchPendingUsers();
-    } catch (error) {
-      console.error('Error approving user:', error);
+    } catch (err) {
+      console.error(
+        'Error approving user:',
+        err
+      );
     }
   };
 
   const handleReject = async (userId) => {
     try {
-      await axios.patch(`/admin/users/${userId}/reject`);
+      await axios.patch(
+        `/admin/users/${userId}/reject`
+      );
       fetchPendingUsers();
-    } catch (error) {
-      console.error('Error rejecting user:', error);
+    } catch (err) {
+      console.error(
+        'Error rejecting user:',
+        err
+      );
     }
   };
 
   return (
-    <div className={styles['admin-panel']}>
-      <h2>Pending Users</h2>
-      {pendingUsers.length === 0 ? (
-        <p>No pending users.</p>
-      ) : (
-        <table className={styles['admin-panel__table']}>
-          <thead>
-            <tr>
-              <th>Email</th>
-              <th>Username</th>
-              <th>Select Role</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pendingUsers.map(user => (
-              <tr key={user._id}>
-                <td>{user.email}</td>
-                <td>{user.username}</td>
-                <td>
-                  <select
-                    value={selectedRoles[user._id] || user.role || ''}
-                    onChange={(e) => handleRoleChange(user._id, e.target.value)}
-                    className={styles['admin-panel__select']}
-                  >
-                    <option value="">Select Role</option>
-
-                    {availableRoles.map((role) => (
-                      <option key={role} value={role}>
-                        {roleLabels[role] || role}
-                      </option>
-                    ))}
-                  </select>
-                </td>
-                <td className={styles['admin-panel__button']}>
-                  <button
-                    onClick={() => handleApprove(user._id)}
-                    className={styles['admin-panel__button-approve']}
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => handleReject(user._id)}
-                    className={styles['admin-panel__button-reject']}
-                    style={{ marginLeft: '0.5rem' }}
-                  >
-                    Reject
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
+    <AdminPanelView
+      pendingUsers={pendingUsers}
+      availableRoles={availableRoles}
+      selectedRoles={selectedRoles}
+      onRoleChange={handleRoleChange}
+      onApprove={handleApprove}
+      onReject={handleReject}
+    />
   );
 };
 

@@ -1,18 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import axios from '../../api/axios';
-import styles from './materialsOverview.module.css';
-
-const formatPrice = (value) => {
-  if (value === null || value === undefined) return '0.00 zł';
-
-  return new Intl.NumberFormat('pl-PL', {
-    style: 'currency',
-    currency: 'PLN',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
-};
-
+import MaterialsOverviewView from './MaterialsOverviewView';
 
 const MaterialsOverview = () => {
   const [materials, setMaterials] = useState([]);
@@ -20,6 +8,7 @@ const MaterialsOverview = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+
   const [editingId, setEditingId] = useState(null);
   const [priceDraft, setPriceDraft] = useState('');
   const [editingQtyId, setEditingQtyId] = useState(null);
@@ -40,12 +29,10 @@ const MaterialsOverview = () => {
   const filteredMaterials = useMemo(() => {
     return materials.filter((m) => {
       if (selectedCategory !== 'all') {
-        if (!m.category) return false;
-
         const categoryId =
           typeof m.category === 'string'
             ? m.category
-            : m.category._id;
+            : m.category?._id;
 
         if (categoryId !== selectedCategory) return false;
       }
@@ -60,12 +47,22 @@ const MaterialsOverview = () => {
     });
   }, [materials, selectedCategory, search]);
 
-  const startEdit = (material) => {
-    setEditingId(material._id);
-    setPriceDraft('');
+  const deleteMaterial = async (m) => {
+    if (!confirm('Delete this material?')) return;
+
+    await axios.delete(`/materials/${m._id}`);
+
+    setMaterials((prev) =>
+      prev.filter((x) => x._id !== m._id)
+    );
   };
 
-  const cancelEdit = () => {
+  const startEditPrice = (m) => {
+    setEditingId(m._id);
+    setPriceDraft(m.price ?? '');
+  };
+
+  const cancelEditPrice = () => {
     setEditingId(null);
     setPriceDraft('');
   };
@@ -80,12 +77,18 @@ const MaterialsOverview = () => {
 
     setMaterials((prev) =>
       prev.map((x) =>
-        x._id === m._id ? { ...x, price: value } : x
+        x._id === m._id
+          ? { ...x, price: value }
+          : x
       )
     );
 
-    setEditingId(null);
-    setPriceDraft('');
+    cancelEditPrice();
+  };
+
+  const startEditQty = (m) => {
+    setEditingQtyId(m._id);
+    setQtyDraft(m.quantity ?? '');
   };
 
   const saveQty = async (m) => {
@@ -108,143 +111,32 @@ const MaterialsOverview = () => {
     setQtyDraft('');
   };
 
-  if (loading) return <p>Loading...</p>;
-
   return (
-    <div className={styles.wrapper}>
-      <h3 className={styles.title}>Materials</h3>
+    <MaterialsOverviewView
+      loading={loading}
+      materials={filteredMaterials}
+      categories={categories}
+      selectedCategory={selectedCategory}
+      search={search}
 
-      <div className={styles.filter}>
-        <label>
-          Category:
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            <option value="all">All</option>
-            {categories.map((c) => (
-              <option key={c._id} value={c._id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+      editingId={editingId}
+      priceDraft={priceDraft}
+      editingQtyId={editingQtyId}
+      qtyDraft={qtyDraft}
 
-      <div className={styles.search}>
-        <input
-          type="text"
-          placeholder="Search by name..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
+      onCategoryChange={setSelectedCategory}
+      onSearchChange={setSearch}
+      onDelete={deleteMaterial}
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th></th>
-            <th>Name</th>
-            <th>Unit</th>
-            <th>Price</th>
-            <th>Qty</th>
-          </tr>
-        </thead>
+      onStartEditPrice={startEditPrice}
+      onCancelEditPrice={cancelEditPrice}
+      onPriceDraftChange={setPriceDraft}
+      onSavePrice={savePrice}
 
-        <tbody>
-          {filteredMaterials.map((m) => (
-            <tr key={m._id}>
-              <td>
-                <button
-                  className={styles.delete}
-                  onClick={async () => {
-                    if (!confirm('Delete this material?')) return;
-
-                    await axios.delete(`/materials/${m._id}`);
-
-                    setMaterials((prev) =>
-                      prev.filter((x) => x._id !== m._id)
-                    );
-                  }}
-                >
-                  ✕
-                </button>
-              </td>
-
-              <td>{m.name}</td>
-              <td>{m.unit}</td>
-              <td>
-                {editingId === m._id ? (
-                  <div className={styles.priceEdit}>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      autoFocus
-                      placeholder={m.price ?? 0}
-                      value={priceDraft}
-                      onChange={(e) => setPriceDraft(e.target.value)}
-                    />
-
-                    {priceDraft && (
-                      <button
-                        className={styles.save}
-                        onClick={() => savePrice(m)}
-                      >
-                        Save
-                      </button>
-                    )}
-
-                    <button
-                      className={styles.cancel}
-                      onClick={cancelEdit}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <span
-                    className={styles.price}
-                    onClick={() => startEdit(m)}
-                  >
-                    {formatPrice(m.price)}
-                  </span>
-                )}
-              </td>
-              <td>
-                {editingQtyId === m._id ? (
-                  <>
-                    <input
-                      type="number"
-                      autoFocus
-                      value={qtyDraft}
-                      onChange={(e) =>
-                        setQtyDraft(e.target.value)
-                      }
-                    />
-                    <button
-                      className={styles.save}
-                      onClick={() => saveQty(m)}
-                    >
-                      Save
-                    </button>
-                  </>
-                ) : (
-                  <span
-                    onClick={() => {
-                      setEditingQtyId(m._id);
-                      setQtyDraft(m.quantity ?? '');
-                    }}
-                  >
-                    {m.quantity ?? '—'}
-                  </span>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+      onStartEditQty={startEditQty}
+      onQtyDraftChange={setQtyDraft}
+      onSaveQty={saveQty}
+    />
   );
 };
 

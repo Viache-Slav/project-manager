@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../api/axios';
 
-import DesignInfo from '../components/design/DesignInfo';
-import DesignMaterials from '../components/design/DesignMaterials';
-import DesignActions from '../components/design/DesignActions';
+import DesignInfo from '../components/design/info/DesignInfo';
+import DesignMaterials from '../components/design/material/DesignMaterials';
+import DesignActions from '../components/design//action/DesignActions';
 import DesignExpensesEditor from '../components/design/expenses/DesignExpensesEditor';
 import DesignSummary from '../components/design/summary/DesignSummary';
 import DesignExpenses from '../components/design/expenses/DesignExpenses';
 import AccordionSection from '../components/ui/AccordionSection';
-import DesignFabrics from '../components/design/DesignFabrics';
+import DesignFabrics from '../components/design/fabrics/DesignFabrics';
 
 const DesignItemPage = () => {
   const { id } = useParams();

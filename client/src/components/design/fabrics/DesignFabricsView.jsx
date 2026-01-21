@@ -1,118 +1,26 @@
-import { useEffect, useMemo, useState } from 'react';
-import axios from '../../api/axios';
 import styles from './designFabrics.module.css';
 
-const DesignFabrics = ({ status, fabrics, setFabrics }) => {
-  const disabled = status !== 'submitted';
+const DesignFabricsView = ({
+  loading,
+  disabled,
 
-  const [allFabrics, setAllFabrics] = useState([]);
-  const [loading, setLoading] = useState(true);
+  fabrics,
 
-  const [draft, setDraft] = useState({
-    brand: 'Davis',
-    collectionName: '',
-    pricePerMeter: 0,
-    editingPrice: false,
-  });
+  brands,
+  collections,
 
-  const [editingRowId, setEditingRowId] = useState(null);
-  const [rowPriceDraft, setRowPriceDraft] = useState('');
+  draft,
+  setDraft,
 
-  useEffect(() => {
-    axios
-      .get('/fabrics/meta') 
-      .then((res) => setAllFabrics(res.data))
-      .finally(() => setLoading(false));
-  }, []);
+  editingRowId,
+  rowPriceDraft,
+  setEditingRowId,
+  setRowPriceDraft,
 
-  const collectionsByBrand = useMemo(() => {
-    const map = {};
-
-    for (const row of allFabrics) {
-      if (!row.brand || !Array.isArray(row.collections)) continue;
-
-      map[row.brand] ||= [];
-
-      for (const c of row.collections) {
-        if (!c?.name) continue;
-        if (!map[row.brand].some(x => x.name === c.name)) {
-          map[row.brand].push({
-            name: c.name,
-            pricePerMeter: c.pricePerMeter ?? 0,
-          });
-        }
-      }
-    }
-
-    return map;
-    }, [allFabrics]);
-
-  const brands = useMemo(() => Object.keys(collectionsByBrand), [collectionsByBrand]);
-
-  const collections = useMemo(() => {
-    return collectionsByBrand[draft.brand] || [];
-  }, [collectionsByBrand, draft.brand]);
-
-  const add = () => {
-    if (!draft.brand || !draft.collectionName) {
-      alert('Select brand and collection');
-      return;
-    }
-
-    const exists = (fabrics || []).some(
-      (x) => x.brand === draft.brand && x.collectionName === draft.collectionName
-    );
-    if (exists) {
-      alert('This collection is already added');
-      return;
-    }
-
-    setFabrics((prev) => [
-      ...(prev || []),
-      {
-        id: crypto.randomUUID(),
-        brand: draft.brand,
-        collectionName: draft.collectionName,
-        pricePerMeter: Number(draft.pricePerMeter) || 0,
-      },
-    ]);
-
-    setDraft((prev) => ({
-      ...prev,
-      collectionName: '',
-      pricePerMeter: 0,
-      editingPrice: false,
-    }));
-  };
-
-  const remove = (id) => {
-    setFabrics((prev) => (prev || []).filter((x) => x.id !== id));
-  };
-
-  const saveRowPrice = async (row) => {
-    const value = Number(rowPriceDraft);
-
-    if (!Number.isFinite(value) || value < 0) {
-      alert('Invalid price');
-      return;
-    }
-
-    await axios.put('/fabrics/collection-price', {
-      brand: row.brand,
-      collectionName: row.collectionName,
-      pricePerMeter: value,
-    });
-
-    setFabrics((prev) =>
-      (prev || []).map((x) =>
-        x.id === row.id ? { ...x, pricePerMeter: value } : x
-      )
-    );
-
-    setEditingRowId(null);
-    setRowPriceDraft('');
-  };
-
+  onAdd,
+  onRemove,
+  onSaveRowPrice,
+}) => {
   return (
     <section className={styles.wrapper}>
       <h3>Fabrics for client</h3>
@@ -139,16 +47,22 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
                             step="0.01"
                             autoFocus
                             value={rowPriceDraft}
-                            onChange={(e) => setRowPriceDraft(e.target.value)}
+                            onChange={(e) =>
+                              setRowPriceDraft(e.target.value)
+                            }
                             onKeyDown={(e) => {
-                              if (e.key === 'Enter') saveRowPrice(f);
+                              if (e.key === 'Enter') {
+                                onSaveRowPrice(f);
+                              }
                               if (e.key === 'Escape') {
                                 setEditingRowId(null);
                                 setRowPriceDraft('');
                               }
                             }}
                           />
-                          <button onClick={() => saveRowPrice(f)}>Save</button>
+                          <button onClick={() => onSaveRowPrice(f)}>
+                            Save
+                          </button>
                           <button
                             onClick={() => {
                               setEditingRowId(null);
@@ -165,7 +79,8 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
                             if (disabled) return;
                             setEditingRowId(f.id);
                             setRowPriceDraft(
-                              f.pricePerMeter === null || f.pricePerMeter === undefined
+                              f.pricePerMeter === null ||
+                                f.pricePerMeter === undefined
                                 ? ''
                                 : String(f.pricePerMeter)
                             );
@@ -180,7 +95,7 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
                   {!disabled && (
                     <button
                       className={styles.remove}
-                      onClick={() => remove(f.id)}
+                      onClick={() => onRemove(f.id)}
                     >
                       ✕
                     </button>
@@ -206,9 +121,7 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
                   }
                 >
                   {brands.length === 0 && (
-                    <option key="fallback-davis" value="Davis">
-                      Davis
-                    </option>
+                    <option value="Davis">Davis</option>
                   )}
 
                   {brands.map((b) => (
@@ -225,22 +138,28 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
                   value={draft.collectionName}
                   onChange={(e) => {
                     const name = e.target.value;
-                    const col = collections.find((c) => c.name === name);
+                    const col = collections.find(
+                      (c) => c.name === name
+                    );
 
                     setDraft((prev) => ({
                       ...prev,
                       collectionName: name,
                       pricePerMeter: col?.pricePerMeter ?? 0,
-                      editingPrice: (col?.pricePerMeter ?? 0) === 0,
+                      editingPrice:
+                        (col?.pricePerMeter ?? 0) === 0,
                     }));
                   }}
                 >
-                  <option key="placeholder-collection" value="">
+                  <option value="">
                     Select collection
                   </option>
 
                   {collections.map((c) => (
-                    <option key={`${draft.brand}-${c.name}`} value={c.name}>
+                    <option
+                      key={`${draft.brand}-${c.name}`}
+                      value={c.name}
+                    >
                       {c.name}
                     </option>
                   ))}
@@ -263,30 +182,18 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
                           pricePerMeter: e.target.value,
                         }))
                       }
-                      onBlur={async () => {
-                        const value = Number(draft.pricePerMeter);
-                        if (!Number.isFinite(value) || value < 0) return;
-
-                        await axios.put('/fabrics/collection-price', {
-                          brand: draft.brand,
-                          collectionName: draft.collectionName,
-                          pricePerMeter: value,
-                        });
-
-                        const { data } = await axios.get('/fabrics/meta');
-                        setAllFabrics(data);
-
-                        setDraft((d) => ({
-                          ...d,
-                          editingPrice: false,
-                        }));
+                      onBlur={() => {
+                        /* handled in container */
                       }}
                     />
                   ) : (
                     <div
                       className={styles.priceView}
                       onClick={() =>
-                        setDraft((d) => ({ ...d, editingPrice: true }))
+                        setDraft((d) => ({
+                          ...d,
+                          editingPrice: true,
+                        }))
                       }
                     >
                       {Number(draft.pricePerMeter) || 0} zł / m ✏
@@ -295,7 +202,7 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
                 </label>
               )}
 
-              <button className={styles.add} onClick={add}>
+              <button className={styles.add} onClick={onAdd}>
                 + Add
               </button>
             </div>
@@ -303,7 +210,8 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
 
           {disabled && (
             <div className={styles.hint}>
-              Collections can be edited only in status "submitted"
+              Collections can be edited only in status
+              "submitted"
             </div>
           )}
         </>
@@ -312,4 +220,4 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
   );
 };
 
-export default DesignFabrics;
+export default DesignFabricsView;

@@ -1,13 +1,14 @@
+
 import { useEffect, useState } from 'react';
-import axios from '../../api/axios';
-import styles from './designActions.module.css';
+import axios from '../../../api/axios';
+import DesignActionsView from './DesignActionsView';
 
 const DesignActions = ({
   item,
   designItemId,
   status,
   materials,
-  fabrics, 
+  fabrics,
   designerComment,
   setDesignerComment,
   onUpdated,
@@ -28,13 +29,10 @@ const DesignActions = ({
     }
   }, [user, status, item?.salePrice]);
 
-  const isAdmin = user?.role === 'admin';
-  const isSubmitted = status === 'submitted';
+  if (!user) return null;
 
-  const canSave = !isAdmin && isSubmitted;
-  const canSendToApprove = isSubmitted;
-  const canApprove = isAdmin && status === 'to_approve';
-  const canReturn = isAdmin && (status === 'to_approve' || status === 'approved');
+  const isAdmin = user.role === 'admin';
+  const isSubmitted = status === 'submitted';
 
   const normalizeMaterials = () =>
     (materials || [])
@@ -84,7 +82,6 @@ const DesignActions = ({
       }
     );
 
-    alert('Saved');
     onUpdated?.();
   };
 
@@ -107,7 +104,6 @@ const DesignActions = ({
       }
     );
 
-    alert('Sent to approve');
     onUpdated?.();
   };
 
@@ -116,7 +112,6 @@ const DesignActions = ({
       `/design-items/${designItemId}/return`
     );
 
-    alert('Returned to recalculation');
     onUpdated?.();
   };
 
@@ -125,9 +120,9 @@ const DesignActions = ({
       `/design-items/${designItemId}/approve`
     );
 
-    alert('Approved');
     onUpdated?.();
   };
+
   const saveSalePrice = async () => {
     const num = Number(salePriceDraft);
 
@@ -141,73 +136,38 @@ const DesignActions = ({
       { salePrice: num }
     );
 
-    alert('Sale price saved');
     onUpdated?.();
   };
 
-  if (!user) return null;
+  const actions = {
+    save: !isAdmin && isSubmitted ? save : null,
+    submit: isSubmitted ? submit : null,
+    return:
+      isAdmin && ['to_approve', 'approved'].includes(status)
+        ? returnToSubmitted
+        : null,
+    approve:
+      isAdmin && status === 'to_approve'
+        ? approve
+        : null,
+  };
 
   return (
-    <div className={styles.wrapper}>
-      {isAdmin && status === 'approved' && (
-        <div className={styles.salePrice}>
-          <h4>Sale price</h4>
-
-          <input
-            type="number"
-            step="0.01"
-            value={salePriceDraft}
-            onChange={(e) => setSalePriceDraft(e.target.value)}
-            placeholder="Sale price"
-          />
-
-          <div style={{ marginTop: 8 }}>
-            <button onClick={saveSalePrice}>
-              Save price
-            </button>
-          </div>
-        </div>
-      )}
-      
-      {isSubmitted && !isAdmin && (
-        <>
-          <h4>Comment</h4>
-          <textarea
-            value={designerComment}
-            onChange={(e) =>
-              setDesignerComment(e.target.value)
-            }
-            placeholder="Comment"
-          />
-        </>
-      )}
-
-      <div className={styles.actions}>
-        {canSave && (
-          <button onClick={save}>
-            Save
-          </button>
-        )}
-
-        {canSendToApprove && (
-          <button onClick={submit}>
-            Send to approve
-          </button>
-        )}
-
-        {canReturn && (
-          <button onClick={returnToSubmitted}>
-            Send to recalculation
-          </button>
-        )}
-
-        {canApprove && (
-          <button onClick={approve}>
-            Approve
-          </button>
-        )}
-      </div>
-    </div>
+    <DesignActionsView
+      isAdmin={isAdmin}
+      isSubmitted={isSubmitted}
+      status={status}
+      salePriceDraft={salePriceDraft}
+      onSalePriceChange={(e) =>
+        setSalePriceDraft(e.target.value)
+      }
+      onSaveSalePrice={saveSalePrice}
+      designerComment={designerComment}
+      onCommentChange={(e) =>
+        setDesignerComment(e.target.value)
+      }
+      actions={actions}
+    />
   );
 };
 

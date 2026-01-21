@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from '../../api/axios';
-import styles from './publicDesignItems.module.css';
-
-import ClientRegisterForm from '../public/ClientRegisterForm';
-import Modal from '../ui/Modal';
+import PublicDesignItemsView from './PublicDesignItemsView';
 
 const PublicDesignItems = () => {
   const [items, setItems] = useState([]);
@@ -43,7 +40,8 @@ const PublicDesignItems = () => {
   }, [isAuth]);
 
   if (loading) return <div>Loading...</div>;
-  if (!items.length) return <div>No products available</div>;
+  if (!items.length)
+    return <div>No products available</div>;
 
   const addToOrder = (item) => {
     setOrderItems((prev) => {
@@ -54,7 +52,10 @@ const PublicDesignItems = () => {
       if (existing) {
         return prev.map((i) =>
           i.designItemId === item._id
-            ? { ...i, quantity: i.quantity + 1 }
+            ? {
+                ...i,
+                quantity: i.quantity + 1,
+              }
             : i
         );
       }
@@ -99,81 +100,17 @@ const PublicDesignItems = () => {
   };
 
   return (
-    <div className={styles.grid}>
-      {items.map((item) => (
-        <div key={item._id} className={styles.card}>
-          {item.images?.[0] && (
-            <img
-              src={`${import.meta.env.VITE_API_URL}/files/${item.images[0]}`}
-              alt={item.title}
-              className={styles.image}
-            />
-          )}
-
-          <div className={styles.title}>{item.title}</div>
-          <div className={styles.type}>{item.type?.name}</div>
-
-          <div className={styles.price}>
-            Price: <strong>{item.salePrice} zł</strong>
-          </div>
-
-          <button
-            className={styles.addButton}
-            onClick={() => addToOrder(item)}
-          >
-            Add to order
-          </button>
-        </div>
-      ))}
-
-      {orderItems.length > 0 && (
-        <div className={styles.orderInfo}>
-          In order:{' '}
-          {orderItems.reduce((sum, i) => sum + i.quantity, 0)} items
-        </div>
-      )}
-
-      {orderItems.length > 0 && (
-        <div className={styles.orderForm}>
-          {!isAuth && (
-            <button
-              className={styles.submitButton}
-              onClick={() => setShowAuthModal(true)}
-            >
-              Register to place order
-            </button>
-          )}
-
-          {isAuth && (
-            <>
-              <h4>Contact details</h4>
-
-              <div className={styles.customerInfo}>
-                <div><strong>Name:</strong> {customer.name}</div>
-                <div><strong>Email:</strong> {customer.email}</div>
-                <div><strong>Phone:</strong> {customer.phone}</div>
-              </div>
-
-              <button
-                className={styles.submitButton}
-                onClick={submitOrder}
-              >
-                Place order
-              </button>
-            </>
-          )}
-        </div>
-      )}
-
-      <Modal
-        open={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-      >
-        <ClientRegisterForm
-          onSuccess={() => setShowAuthModal(false)}
-        />
-      </Modal>
-    </div>
+    <PublicDesignItemsView
+      items={items}
+      orderItems={orderItems}
+      isAuth={isAuth}
+      customer={customer}
+      showAuthModal={showAuthModal}
+      onAddToOrder={addToOrder}
+      onSubmitOrder={submitOrder}
+      onOpenAuth={() => setShowAuthModal(true)}
+      onCloseAuth={() => setShowAuthModal(false)}
+    />
   );
 };
 
