@@ -1,31 +1,16 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from '../../api/axios';
 import styles from './designCatalog.module.css';
-import DesignItemUploadForm from './DesignItemUploadForm';
+import DesignItemUploadForm from '../upload/DesignItemUploadForm';
 
-const DesignCatalog = () => {
-  const [items, setItems] = useState([]);
-  const [editingItem, setEditingItem] = useState(null);
-  const navigate = useNavigate();
-
-  const isAdmin = true;
-
-  useEffect(() => {
-    loadItems();
-  }, []);
-
-  const loadItems = async () => {
-    const { data } = await axios.get('/design-items');
-    setItems(data);
-  };
-
-  const handleDelete = async (id) => {
-    if (!confirm('Delete this item?')) return;
-    await axios.delete(`/design-items/${id}`);
-    loadItems();
-  };
-
+const DesignCatalogView = ({
+  items,
+  isAdmin,
+  onOpenItem,
+  onEdit,
+  onDelete,
+  editingItem,
+  onSaved,
+  onCancelEdit,
+}) => {
   return (
     <>
       <section>
@@ -39,18 +24,18 @@ const DesignCatalog = () => {
               <div
                 key={item._id}
                 className={styles.card}
-                onClick={() => navigate(`/design-items/${item._id}`)}
+                onClick={() => onOpenItem(item._id)}
               >
                 {isAdmin && (
                   <div
                     className={styles.actions}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <button onClick={() => setEditingItem(item)}>
+                    <button onClick={() => onEdit(item)}>
                       Edit
                     </button>
 
-                    <button onClick={() => handleDelete(item._id)}>
+                    <button onClick={() => onDelete(item._id)}>
                       Delete
                     </button>
                   </div>
@@ -83,11 +68,8 @@ const DesignCatalog = () => {
           <div className={styles.modal}>
             <DesignItemUploadForm
               editingItem={editingItem}
-              onSaved={() => {
-                setEditingItem(null);
-                loadItems();
-              }}
-              onCancel={() => setEditingItem(null)}
+              onSaved={onSaved}
+              onCancel={onCancelEdit}
             />
           </div>
         </div>
@@ -96,4 +78,4 @@ const DesignCatalog = () => {
   );
 };
 
-export default DesignCatalog;
+export default DesignCatalogView;

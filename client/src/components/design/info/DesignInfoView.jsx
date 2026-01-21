@@ -1,22 +1,14 @@
-import { useEffect, useState } from 'react';
-import axios from '../../api/axios';
 import styles from './designInfo.module.css';
 
-const DesignInfo = ({ item }) => {
-  const { title, type, images, dimensions, comment, _id } = item;
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    axios.get('/auth/user').then(res => setUser(res.data));
-  }, []);
-
-  const handleDeleteImage = async (imageId) => {
-    if (!confirm('Delete this image?')) return;
-
-    await axios.delete(`/design-items/${_id}/images/${imageId}`);
-    window.location.reload();
-  };
-
+const DesignInfoView = ({
+  title,
+  type,
+  images,
+  dimensions,
+  comment,
+  canDeleteImages,
+  onDeleteImage,
+}) => {
   return (
     <section className={styles.wrapper}>
       <h2 className={styles.title}>{title}</h2>
@@ -30,10 +22,10 @@ const DesignInfo = ({ item }) => {
               className={styles.image}
             />
 
-            {['admin', 'designer'].includes(user?.role) && (
+            {canDeleteImages && (
               <button
                 className={styles.remove}
-                onClick={() => handleDeleteImage(id)}
+                onClick={() => onDeleteImage(id)}
                 title="Delete image"
               >
                 ×
@@ -44,21 +36,29 @@ const DesignInfo = ({ item }) => {
       </div>
 
       <div className={styles.row}>
-        <span className={styles.label}>Product type:</span>
+        <span className={styles.label}>
+          Product type:
+        </span>
         <span>{type?.name || '—'}</span>
       </div>
 
       <div className={styles.row}>
-        <span className={styles.label}>Dimensions:</span>
+        <span className={styles.label}>
+          Dimensions:
+        </span>
         <span>
           {dimensions.width} × {dimensions.height}
-          {dimensions.depth ? ` × ${dimensions.depth}` : ''}
+          {dimensions.depth
+            ? ` × ${dimensions.depth}`
+            : ''}
         </span>
       </div>
 
       {comment && (
         <div className={styles.comment}>
-          <span className={styles.label}>Comment:</span>
+          <span className={styles.label}>
+            Comment:
+          </span>
           <p>{comment}</p>
         </div>
       )}
@@ -66,4 +66,4 @@ const DesignInfo = ({ item }) => {
   );
 };
 
-export default DesignInfo;
+export default DesignInfoView;
