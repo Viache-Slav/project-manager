@@ -49,7 +49,7 @@ const designItemSchema = new Schema(
         {
           brand: { type: String, trim: true },
           collectionName: { type: String, trim: true },
-          meterage: { type: Number, min: 0 },
+          meterage: { type: Number, min: 0.01 },
         },
       ],
     },

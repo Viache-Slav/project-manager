@@ -3,7 +3,7 @@ import {
   createDesignItem, getCalculation, updateExpenses, updateSalePrice,
   getDesignItemById, saveCalculation, getDesignItems, updateDesignItem,
   deleteDesignItem, deleteDesignItemImage, approveCalculation, returnToSubmitted,
-  getPublicDesignItems
+  getPublicDesignItems, updateFabrics
  } from '../controllers/designItemController.js';
 import { protect, checkRole } from '../middleware/protect.js';
 import { uploadMemory } from '../middleware/uploadMemory.js';
@@ -31,5 +31,6 @@ router.get('/:id', protect, getDesignItemById);
 router.get('/:id/calculation', protect, checkRole('admin'), getCalculation);
 
 router.put( '/:id/expenses', protect, checkRole('admin'), updateExpenses );
+router.put('/:id/fabrics', protect, updateFabrics);
 
 export default router;
