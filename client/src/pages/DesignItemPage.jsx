@@ -50,14 +50,13 @@ const DesignItemPage = () => {
       setMaterials([]);
     }
 
-    if (data.calculation?.fabrics) {
+    if (data.fabricSelection?.collections) {
       setFabrics(
-        data.calculation.fabrics.map((f) => ({
-          id: crypto.randomUUID(),
+        data.fabricSelection.collections.map((f) => ({
+          id: f._id || crypto.randomUUID(),
           brand: f.brand,
-          collection: f.collection,
+          collectionName: f.collectionName,
           meterage: f.meterage,
-          allowedForClient: f.allowedForClient ?? true,
         }))
       );
     } else {
@@ -104,6 +103,7 @@ const DesignItemPage = () => {
           status={item.status}
           fabrics={fabrics}
           setFabrics={setFabrics}
+          designItemId={id}
         />
 
         {item.calculation && (

@@ -1,8 +1,19 @@
+
 import { useEffect, useMemo, useState } from 'react';
 import axios from '../../../api/axios';
 import DesignFabricsView from './DesignFabricsView';
 
-const DesignFabrics = ({ status, fabrics, setFabrics }) => {
+const norm = (v) => String(v || '').trim().toLowerCase();
+
+const getPriceFromMeta = (allFabrics, brand, collectionName) =>
+  allFabrics
+    .find((b) => norm(b.brand) === norm(brand))
+    ?.collections.find(
+      (c) => norm(c.name) === norm(collectionName)
+    )
+    ?.pricePerMeter ?? null;
+
+const DesignFabrics = ({ status, fabrics, setFabrics, designItemId }) => {
   const disabled = status !== 'submitted';
 
   const [allFabrics, setAllFabrics] = useState([]);
@@ -11,8 +22,7 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
   const [draft, setDraft] = useState({
     brand: 'Davis',
     collectionName: '',
-    pricePerMeter: 0,
-    editingPrice: false,
+    meterage: '',
   });
 
   const [editingRowId, setEditingRowId] = useState(null);
@@ -25,26 +35,42 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    if (!designItemId) return;
+
+    axios.get(`/design-items/${designItemId}`).then((res) => {
+      const collections =
+        res.data?.fabricSelection?.collections || [];
+
+      setFabrics(
+        collections.map((c) => ({
+          id: c._id || crypto.randomUUID(),
+          brand: c.brand,
+          collectionName: c.collectionName,
+          meterage: Number(c.meterage) || 0,
+        }))
+      );
+    });
+  }, [designItemId, setFabrics]);
+
+  const getPrice = (brand, collectionName) =>
+    getPriceFromMeta(allFabrics, brand, collectionName);
+
   const collectionsByBrand = useMemo(() => {
     const map = {};
 
     for (const row of allFabrics) {
-      if (!row.brand || !Array.isArray(row.collections))
-        continue;
+      if (!row.brand || !Array.isArray(row.collections)) continue;
 
       map[row.brand] ||= [];
 
       for (const c of row.collections) {
         if (!c?.name) continue;
 
-        if (
-          !map[row.brand].some(
-            (x) => x.name === c.name
-          )
-        ) {
+        if (!map[row.brand].some((x) => x.name === c.name)) {
           map[row.brand].push({
             name: c.name,
-            pricePerMeter: c.pricePerMeter ?? 0,
+            pricePerMeter: c.pricePerMeter ?? null,
           });
         }
       }
@@ -53,65 +79,62 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
     return map;
   }, [allFabrics]);
 
-  const brands = useMemo(
-    () => Object.keys(collectionsByBrand),
-    [collectionsByBrand]
-  );
+  const brands = Object.keys(collectionsByBrand);
+  const collections = collectionsByBrand[draft.brand] || [];
 
-  const collections = useMemo(
-    () => collectionsByBrand[draft.brand] || [],
-    [collectionsByBrand, draft.brand]
-  );
+  const persistFabrics = async (next) => {
+    if (!designItemId) return;
 
-  const add = () => {
-    if (!draft.brand || !draft.collectionName) {
-      alert('Select brand and collection');
-      return;
-    }
+    await axios.put(`/design-items/${designItemId}/fabrics`, {
+      fabrics: next.map((f) => ({
+        brand: f.brand,
+        collectionName: f.collectionName,
+        meterage: Number(f.meterage),
+      })),
+    });
+  };
 
-    const exists = (fabrics || []).some(
-      (x) =>
-        x.brand === draft.brand &&
-        x.collectionName === draft.collectionName
+  const add = async () => {
+    if (!draft.brand || !draft.collectionName) return;
+    if (!draft.meterage || Number(draft.meterage) <= 0) return;
+
+    const exists = fabrics.some(
+      (f) =>
+        f.brand === draft.brand &&
+        f.collectionName === draft.collectionName
     );
 
-    if (exists) {
-      alert('This collection is already added');
-      return;
-    }
+    if (exists) return;
 
-    setFabrics((prev) => [
-      ...(prev || []),
+    const next = [
+      ...fabrics,
       {
         id: crypto.randomUUID(),
         brand: draft.brand,
         collectionName: draft.collectionName,
-        pricePerMeter:
-          Number(draft.pricePerMeter) || 0,
+        meterage: Number(draft.meterage),
       },
-    ]);
+    ];
+
+    setFabrics(next);
+    await persistFabrics(next);
 
     setDraft({
       brand: draft.brand,
       collectionName: '',
-      pricePerMeter: 0,
-      editingPrice: false,
+      meterage: '',
     });
   };
 
-  const remove = (id) => {
-    setFabrics((prev) =>
-      (prev || []).filter((x) => x.id !== id)
-    );
+  const remove = async (id) => {
+    const next = fabrics.filter((f) => f.id !== id);
+    setFabrics(next);
+    await persistFabrics(next);
   };
 
   const saveRowPrice = async (row) => {
     const value = Number(rowPriceDraft);
-
-    if (!Number.isFinite(value) || value < 0) {
-      alert('Invalid price');
-      return;
-    }
+    if (!Number.isFinite(value) || value < 0) return;
 
     await axios.put('/fabrics/collection-price', {
       brand: row.brand,
@@ -119,13 +142,8 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
       pricePerMeter: value,
     });
 
-    setFabrics((prev) =>
-      (prev || []).map((x) =>
-        x.id === row.id
-          ? { ...x, pricePerMeter: value }
-          : x
-      )
-    );
+    const res = await axios.get('/fabrics/meta');
+    setAllFabrics(res.data);
 
     setEditingRowId(null);
     setRowPriceDraft('');
@@ -139,9 +157,10 @@ const DesignFabrics = ({ status, fabrics, setFabrics }) => {
       brands={brands}
       collections={collections}
       draft={draft}
-      setDraft={setDraft}
       editingRowId={editingRowId}
       rowPriceDraft={rowPriceDraft}
+      getPrice={getPrice}
+      setDraft={setDraft}
       setEditingRowId={setEditingRowId}
       setRowPriceDraft={setRowPriceDraft}
       onAdd={add}

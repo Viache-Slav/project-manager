@@ -142,18 +142,18 @@ export const saveCalculation = async (req, res) => {
       item.status = 'to_approve';
     }
 
-    if (Array.isArray(fabrics)) {
+    if (mode === 'save' && Array.isArray(fabrics)) {
       const normalized = fabrics
-        .filter(
-          (f) =>
-            f &&
-            String(f.brand || '').trim() &&
-            String(f.collection || '').trim() &&
-            Number(f.meterage) > 0
-        )
+        .filter((f) => {
+          const brand = String(f?.brand || '').trim();
+          const collectionName = String(f?.collectionName || f?.collection || '').trim();
+          const meterage = Number(f?.meterage);
+
+          return brand && collectionName && meterage > 0;
+        })
         .map((f) => ({
           brand: String(f.brand).trim(),
-          collection: String(f.collection).trim(),
+          collectionName: String(f.collectionName || f.collection).trim(),
           meterage: Number(f.meterage),
         }));
 
@@ -170,6 +170,45 @@ export const saveCalculation = async (req, res) => {
   }
 };
 
+export const updateFabrics = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { fabrics } = req.body;
+
+    const item = await DesignItem.findById(id);
+    if (!item) {
+      return res.status(404).json({ message: 'Design item not found' });
+    }
+
+    if (item.status !== 'submitted') {
+      return res.status(400).json({ message: 'Editing not allowed' });
+    }
+
+    const normalized = Array.isArray(fabrics)
+      ? fabrics
+          .filter((f) => {
+            const brand = String(f?.brand || '').trim();
+            const collectionName = String(f?.collectionName || f?.collection || '').trim();
+            const meterage = Number(f?.meterage);
+
+            return brand && collectionName && meterage > 0;
+          })
+          .map((f) => ({
+            brand: String(f.brand).trim(),
+            collectionName: String(f.collectionName || f.collection).trim(),
+            meterage: Number(f.meterage),
+          }))
+      : [];
+
+    item.fabricSelection = { collections: normalized };
+    await item.save();
+
+    res.json(item.fabricSelection.collections);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to update fabrics' });
+  }
+};
 
 export const getDesignItems = async (req, res) => {
   const items = await DesignItem.find()

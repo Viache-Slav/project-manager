@@ -54,12 +54,12 @@ const DesignActions = ({
         (f) =>
           f &&
           String(f.brand || '').trim() &&
-          String(f.collection || '').trim() &&
+          String(f.collectionName || '').trim() &&
           Number(f.meterage) > 0
       )
       .map((f) => ({
         brand: String(f.brand).trim(),
-        collection: String(f.collection).trim(),
+        collectionName: String(f.collectionName).trim(),
         meterage: Number(f.meterage),
       }));
 
@@ -87,8 +87,7 @@ const DesignActions = ({
 
   const submit = async () => {
     const payload = normalizeMaterials();
-    const fabricsPayload = normalizeFabrics();
-
+    
     if (!payload.length) {
       alert('Add at least one material with quantity');
       return;
@@ -98,7 +97,6 @@ const DesignActions = ({
       `/design-items/${designItemId}/calculation`,
       {
         materials: payload,
-        fabrics: fabricsPayload,
         comment: designerComment,
         mode: 'send',
       }
