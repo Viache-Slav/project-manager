@@ -1,7 +1,9 @@
 import styles from './designFabrics.module.css';
 
 const renderPrice = (value) =>
-  value === null ? '—' : `${value} zł / m`;
+  typeof value === 'number'
+    ? `${value} zł / m`
+    : '—';
 
 const DesignFabricsView = ({
   loading,
@@ -28,7 +30,6 @@ const DesignFabricsView = ({
 
       {!loading &&
         fabrics.map((f) => {
-          const price = getPrice(f.brand, f.collectionName);
 
           return (
             <div key={f.id} className={styles.row}>
@@ -40,30 +41,49 @@ const DesignFabricsView = ({
                 <div>Meterage: {f.meterage} m</div>
 
                 {editingRowId === f.id ? (
-                  <>
+                  <div className={styles.priceEdit}>
                     <input
                       type="number"
                       value={rowPriceDraft}
                       onChange={(e) =>
                         setRowPriceDraft(e.target.value)
                       }
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          onSaveRowPrice(f);
+                        }
+                        if (e.key === 'Escape') {
+                          setEditingRowId(null);
+                          setRowPriceDraft('');
+                        }
+                      }}
+                      autoFocus
                     />
-                    <button onClick={() => onSaveRowPrice(f)}>
-                      Save
+                    <button className={styles.save} 
+                      onClick={() => onSaveRowPrice(f)}>
+                        Save
                     </button>
-                  </>
+                  </div>
                 ) : (
                   <div
                     className={styles.priceView}
                     onClick={() => {
                       if (disabled) return;
                       setEditingRowId(f.id);
-                      setRowPriceDraft(price ?? '');
+                      setRowPriceDraft(f.price ?? '');
                     }}
                   >
-                    Price: {renderPrice(price)}
+                    Price: {renderPrice(f.price)}
                   </div>
                 )}
+                <div className={styles.total}>
+                  Total:{' '}
+                  <strong>
+                    {typeof f.total === 'number'
+                      ? `${f.total.toFixed(2)} zł`
+                      : '—'}
+                  </strong>
+                </div>
               </div>
 
               {!disabled && (
