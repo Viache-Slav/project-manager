@@ -149,11 +149,28 @@ const DesignFabrics = ({ status, fabrics, setFabrics, designItemId }) => {
     setRowPriceDraft('');
   };
 
+  const fabricsWithTotal = useMemo(() => {
+    if (!allFabrics.length) return fabrics;
+
+    return fabrics.map((f) => {
+      const price = getPrice(f.brand, f.collectionName);
+
+      return {
+        ...f,
+        price: typeof price === 'number' ? price : null,
+        total:
+          typeof price === 'number'
+            ? price * f.meterage
+            : null,
+      };
+    });
+  }, [fabrics, allFabrics]);
+
   return (
     <DesignFabricsView
       loading={loading}
       disabled={disabled}
-      fabrics={fabrics}
+      fabrics={fabricsWithTotal}
       brands={brands}
       collections={collections}
       draft={draft}
