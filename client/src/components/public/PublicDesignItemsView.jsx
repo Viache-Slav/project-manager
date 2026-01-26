@@ -5,6 +5,10 @@ import Modal from '../ui/Modal';
 const PublicDesignItemsView = ({
   items,
   orderItems,
+  selectedFabrics,
+  fabricColors,
+  onSelectFabric,
+  onSelectColor,
   isAuth,
   customer,
   showAuthModal,
@@ -31,6 +35,60 @@ const PublicDesignItemsView = ({
           <div className={styles.price}>
             Price: <strong>{item.salePrice} zł</strong>
           </div>
+
+          {item.fabricOptions?.length > 0 && (
+            <select
+              className={styles.fabricSelect}
+              value={selectedFabrics[item._id]?.collection || ''}
+              onChange={(e) =>
+                onSelectFabric(item._id, e.target.value)
+              }
+            >
+              <option value="">Select collection</option>
+
+              {item.fabricOptions.map((f, i) => (
+                <option
+                  key={i}
+                  value={`${f.brand}||${f.collectionName}`}
+                >
+                  {f.brand} / {f.collectionName}
+                </option>
+              ))}
+            </select>
+          )}
+
+          {fabricColors[item._id]?.length > 0 && (
+            <div className={styles.colorsGrid}>
+              {fabricColors[item._id].map((c) => {
+                const imgId = c.images?.[0];
+                const selected =
+                  selectedFabrics[item._id]?.color === c.colorName;
+
+                return (
+                  <div
+                    key={c._id}
+                    className={`${styles.colorItem} ${
+                      selected ? styles.selected : ''
+                    }`}
+                    onClick={() =>
+                      onSelectColor(item._id, c.colorName)
+                    }
+                  >
+                    {imgId && (
+                      <img
+                        src={`${import.meta.env.VITE_API_URL}/files/${imgId}`}
+                        alt={c.colorName}
+                      />
+                    )}
+
+                    <div className={styles.colorLabel}>
+                      {c.colorName}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           <button
             className={styles.addButton}

@@ -62,7 +62,11 @@ export const getFabricColors = async (req, res) => {
   }
 
   const fabrics = await Fabric.find(
-    { brand, collectionName },
+    { 
+      brand,
+      collectionName,
+      isActive: true, 
+    },
     {
       colorName: 1,
       colorCode: 1,

@@ -40,54 +40,64 @@ const DesignFabricsView = ({
 
                 <div>Meterage: {f.meterage} m</div>
 
-                {editingRowId === f.id ? (
-                  <div className={styles.priceEdit}>
-                    <input
-                      type="number"
-                      value={rowPriceDraft}
-                      onChange={(e) =>
-                        setRowPriceDraft(e.target.value)
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          onSaveRowPrice(f);
+                <div className={styles.priceRow}>
+                  {editingRowId === f.id ? (
+                    <div className={styles.priceEdit}>
+                      <input
+                        type="number"
+                        value={rowPriceDraft}
+                        onChange={(e) =>
+                          setRowPriceDraft(e.target.value)
                         }
-                        if (e.key === 'Escape') {
-                          setEditingRowId(null);
-                          setRowPriceDraft('');
-                        }
-                      }}
-                      autoFocus
-                    />
-                    <button className={styles.save} 
-                      onClick={() => onSaveRowPrice(f)}>
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            onSaveRowPrice(f);
+                          }
+                          if (e.key === 'Escape') {
+                            setEditingRowId(null);
+                            setRowPriceDraft('');
+                          }
+                        }}
+                        autoFocus
+                      />
+                      <button
+                        className={styles.save}
+                        onClick={() => onSaveRowPrice(f)}
+                      >
                         Save
-                    </button>
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      className={styles.priceView}
+                      onClick={() => {
+                        if (disabled) return;
+                        setEditingRowId(f.id);
+                        setRowPriceDraft(f.price ?? '');
+                      }}
+                    >
+                      Price: {renderPrice(f.price)}
+                    </div>
+                  )}
+
+                  <div className={styles.total}>
+                    Total:{' '}
+                    <strong>
+                      {typeof f.total === 'number'
+                        ? `${f.total.toFixed(2)} zł`
+                        : '—'}
+                    </strong>
                   </div>
-                ) : (
-                  <div
-                    className={styles.priceView}
-                    onClick={() => {
-                      if (disabled) return;
-                      setEditingRowId(f.id);
-                      setRowPriceDraft(f.price ?? '');
-                    }}
-                  >
-                    Price: {renderPrice(f.price)}
-                  </div>
-                )}
-                <div className={styles.total}>
-                  Total:{' '}
-                  <strong>
-                    {typeof f.total === 'number'
-                      ? `${f.total.toFixed(2)} zł`
-                      : '—'}
-                  </strong>
                 </div>
               </div>
 
               {!disabled && (
-                <button onClick={() => onRemove(f.id)}>✕</button>
+                <button
+                  className={styles.remove}
+                  onClick={() => onRemove(f.id)}
+                >
+                  ✕
+                </button>
               )}
             </div>
           );

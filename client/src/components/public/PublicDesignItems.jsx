@@ -9,6 +9,8 @@ const PublicDesignItems = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   const isAuth = Boolean(localStorage.getItem('token'));
+  const [selectedFabrics, setSelectedFabrics] = useState({});
+  const [fabricColors, setFabricColors] = useState({});
 
   const [customer, setCustomer] = useState({
     name: '',
@@ -43,33 +45,68 @@ const PublicDesignItems = () => {
   if (!items.length)
     return <div>No products available</div>;
 
-  const addToOrder = (item) => {
-    setOrderItems((prev) => {
-      const existing = prev.find(
-        (i) => i.designItemId === item._id
-      );
+  const selectFabric = (itemId, value) => {
+    setSelectedFabrics((prev) => ({
+      ...prev,
+      [itemId]: {
+        collection: value,
+        color: '',
+      },
+    }));
 
-      if (existing) {
-        return prev.map((i) =>
-          i.designItemId === item._id
-            ? {
-                ...i,
-                quantity: i.quantity + 1,
-              }
-            : i
-        );
-      }
+    const [brand, collectionName] = value.split('||');
+    loadColors(itemId, brand, collectionName);
+  };
 
-      return [
+  const loadColors = async (itemId, brand, collectionName) => {
+    try {
+      const res = await axios.get('/fabrics/colors', {
+        params: { brand, collectionName },
+      });
+
+      setFabricColors((prev) => ({
         ...prev,
-        {
-          designItemId: item._id,
-          title: item.title,
-          quantity: 1,
-          options: {},
+        [itemId]: res.data,
+      }));
+    } catch {
+      setFabricColors((prev) => ({
+        ...prev,
+        [itemId]: [],
+      }));
+    }
+  };
+
+  const selectColor = (itemId, color) => {
+    setSelectedFabrics((prev) => ({
+      ...prev,
+      [itemId]: {
+        ...prev[itemId],
+        color,
+      },
+    }));
+  };
+
+  const addToOrder = (item) => {
+    const selected = selectedFabrics[item._id];
+
+    if (!selected?.collection || !selected?.color) {
+      alert('Select fabric and color');
+      return;
+    }
+
+    const [brand, collectionName] = selected.collection.split('||');
+
+    setOrderItems((prev) => [
+      ...prev,
+      {
+        designItemId: item._id,
+        title: item.title,
+        quantity: 1,
+        options: {
+          fabric: { brand, collectionName, color: selected.color, },
         },
-      ];
-    });
+      },
+    ]);
   };
 
   const submitOrder = async () => {
@@ -103,6 +140,10 @@ const PublicDesignItems = () => {
     <PublicDesignItemsView
       items={items}
       orderItems={orderItems}
+      selectedFabrics={selectedFabrics}
+      fabricColors={fabricColors}
+      onSelectFabric={selectFabric}
+      onSelectColor={selectColor}
       isAuth={isAuth}
       customer={customer}
       showAuthModal={showAuthModal}

@@ -21,7 +21,7 @@ const CatalogImport = () => {
 
     const formData = new FormData();
     formData.append('brand', brand);
-    formData.append('collection', collection);
+    formData.append('collectionName', collection);
     formData.append('techZip', techZip);
     formData.append('imagesZip', imagesZip);
 

@@ -85,3 +85,16 @@
   border-radius: 6px;
   cursor: pointer;
 }
+
+.priceRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+}
+
+.total {
+  font-size: 14px;
+  opacity: 0.85;
+}
+

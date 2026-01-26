@@ -585,8 +585,28 @@ export const getPublicDesignItems = async (req, res) => {
         fabricSelection: 1,
       })
       .sort({ createdAt: -1 });
+    
+    const mapped = items.map((item) => {
+      const obj = item.toObject();
 
-    res.json(items);
+      return {
+        _id: obj._id,
+        title: obj.title,
+        type: obj.type,
+        images: obj.images,
+        dimensions: obj.dimensions,
+        salePrice: obj.salePrice,
+        comment: obj.comment,
+
+        fabricOptions:
+          obj.fabricSelection?.collections?.map((f) => ({
+            brand: f.brand,
+            collectionName: f.collectionName,
+          })) || [],
+      };
+    });
+
+    res.json(mapped);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Failed to load public design items' });
