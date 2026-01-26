@@ -3,9 +3,7 @@ import mongoose from 'mongoose';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import unzipper from 'unzipper';
 import Fabric from '../models/Fabric.js';
-
-const getBucket = () =>
-  new mongoose.mongo.GridFSBucket(mongoose.connection.db);
+import { getBucket } from '../config/gridfs.js'; 
 
 const parseTechPdfFromZip = async (zipStream) => {
   for await (const entry of zipStream) {
@@ -58,24 +56,28 @@ export const importDavisCatalog = async (req, res) => {
 
   busboy.on('field', (name, value) => {
     if (name === 'brand') brand = value;
-    if (name === 'collectionName') collectionName = value;
+    if (name === 'collectionName' || name === 'collection') 
+      collectionName = value;
   });
 
   busboy.on('file', (name, file, info) => {
+    console.log('FILE:', name, info.filename);
     const uploadStream = bucket.openUploadStream(info.filename);
     file.pipe(uploadStream);
 
     uploads.push(
-      new Promise((resolve) => {
+      new Promise((resolve, reject) => {
         uploadStream.on('finish', () => {
           if (name === 'techZip') techZipId = uploadStream.id;
           if (name === 'imagesZip') imagesZipId = uploadStream.id;
           resolve();
         });
+
+        uploadStream.on('error', reject);
       })
     );
   });
-
+  
   busboy.on('finish', async () => {
     try {
       await Promise.all(uploads);
@@ -112,7 +114,10 @@ export const importDavisCatalog = async (req, res) => {
 
         const imageUpload = bucket.openUploadStream(entry.path);
         entry.pipe(imageUpload);
-        await new Promise((r) => imageUpload.on('finish', r));
+        await new Promise((resolve, reject) => {
+          imageUpload.on('finish', resolve);
+          imageUpload.on('error', reject);
+        });
 
         await Fabric.create({
           name: collectionName,
@@ -123,6 +128,7 @@ export const importDavisCatalog = async (req, res) => {
           ...techData,
           pricePerMeter: 0,
           images: [imageUpload.id],
+          isActive: true,
         });
 
         created++;
@@ -133,7 +139,7 @@ export const importDavisCatalog = async (req, res) => {
         created,
       });
     } catch (err) {
-      console.error(err);
+      console.error('Import error:', err);
       res.status(500).json({ message: err.message || 'Import failed' });
     }
   });
