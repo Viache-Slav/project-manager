@@ -5,6 +5,8 @@ import Modal from '../ui/Modal';
 const PublicDesignItemsView = ({
   items,
   orderItems,
+  totalPrice,
+  onRemoveItem,
   selectedFabrics,
   fabricColors,
   onSelectFabric,
@@ -14,6 +16,8 @@ const PublicDesignItemsView = ({
   showAuthModal,
   onAddToOrder,
   onSubmitOrder,
+  onIncreaseQty,
+  onDecreaseQty,
   onOpenAuth,
   onCloseAuth,
 }) => {
@@ -71,7 +75,11 @@ const PublicDesignItemsView = ({
                       selected ? styles.selected : ''
                     }`}
                     onClick={() =>
-                      onSelectColor(item._id, c.colorName)
+                      onSelectColor(
+                        item._id,
+                        c.colorName,
+                        c.images?.[0] || null
+                      )
                     }
                   >
                     {imgId && (
@@ -100,52 +108,97 @@ const PublicDesignItemsView = ({
       ))}
 
       {orderItems.length > 0 && (
-        <div className={styles.orderInfo}>
-          In order:{' '}
-          {orderItems.reduce(
-            (sum, i) => sum + i.quantity,
-            0
-          )}{' '}
-          items
+        <div className={styles.cart}>
+          <h4>Order</h4>
+
+          {orderItems.map((item, index) => (
+            <div key={index} className={styles.cartItem}>
+              {item.productImageId && (
+                <img
+                  className={styles.cartProductImage}
+                  src={`${import.meta.env.VITE_API_URL}/files/${item.productImageId}`}
+                  alt={item.title}
+                />
+              )}
+
+              <div className={styles.cartDetails}>
+                <div className={styles.cartTitle}>{item.title}</div>
+
+                <div className={styles.cartFabric}>
+                  <strong>Fabric:</strong>{' '}
+                  {item.options.fabric.brand} / 
+                  {item.options.fabric.collectionName} / 
+                  {item.options.fabric.color}
+                </div>
+
+                {item.options.fabric.imageId && (
+                  <img
+                    className={styles.cartFabricImage}
+                    src={`${import.meta.env.VITE_API_URL}/files/${item.options.fabric.imageId}`}
+                    alt={item.options.fabric.color}
+                  />
+                )}
+
+                <div className={styles.cartQty}>
+                  <button
+                    className={styles.qtyBtn}
+                    onClick={() => onDecreaseQty(index)}
+                  >
+                    −
+                  </button>
+
+                  <span>{item.quantity}</span>
+
+                  <button
+                    className={styles.qtyBtn}
+                    onClick={() => onIncreaseQty(index)}
+                  >
+                    +
+                  </button>
+                </div>
+
+                <div className={styles.cartSubtotal}>
+                  {item.subtotal.toFixed(2)} zł
+                </div>
+                
+                <button
+                  className={styles.removeBtn}
+                  onClick={() => onRemoveItem(index)}
+                >
+                  ✕
+                </button>
+                
+              </div><div className={styles.cartTotal}>
+                <span>Total:</span>
+                <strong>{totalPrice.toFixed(2)} zł</strong>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
-      {orderItems.length > 0 && (
-        <div className={styles.orderForm}>
-          {!isAuth && (
-            <button
-              className={styles.submitButton}
-              onClick={onOpenAuth}
-            >
-              Register to place order
-            </button>
-          )}
+      {!isAuth ? (
+        <button
+          className={styles.submitButton}
+          onClick={onOpenAuth}
+        >
+          Register to place order
+        </button>
+      ) : (
+        <>
+          <div className={styles.customerInfo}>
+            <div>{customer.name}</div>
+            <div>{customer.email}</div>
+            <div>{customer.phone}</div>
+          </div>
 
-          {isAuth && (
-            <>
-              <h4>Contact details</h4>
-
-              <div className={styles.customerInfo}>
-                <div>
-                  <strong>Name:</strong> {customer.name}
-                </div>
-                <div>
-                  <strong>Email:</strong> {customer.email}
-                </div>
-                <div>
-                  <strong>Phone:</strong> {customer.phone}
-                </div>
-              </div>
-
-              <button
-                className={styles.submitButton}
-                onClick={onSubmitOrder}
-              >
-                Place order
-              </button>
-            </>
-          )}
-        </div>
+          <button
+            className={styles.submitButton}
+            onClick={onSubmitOrder}
+          >
+            Place order
+          </button>
+        </>
       )}
 
       <Modal open={showAuthModal} onClose={onCloseAuth}>
