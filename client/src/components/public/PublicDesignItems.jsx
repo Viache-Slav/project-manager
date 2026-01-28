@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from '../../api/axios';
 import PublicDesignItemsView from './PublicDesignItemsView';
+import MyOrders from './MyOrders';
 
 const PublicDesignItems = () => {
   const [items, setItems] = useState([]);
@@ -16,6 +17,7 @@ const PublicDesignItems = () => {
     name: '',
     email: '',
     phone: '',
+    role: null,
   });
 
   const totalPrice = orderItems.reduce(
@@ -41,6 +43,7 @@ const PublicDesignItems = () => {
           name: user.name || '',
           email: user.email || '',
           phone: user.phone || '',
+          role: user.role,
         });
       })
       .catch(() => {});
@@ -108,7 +111,8 @@ const PublicDesignItems = () => {
         i.designItemId === item._id &&
         i.options.fabric.brand === brand &&
         i.options.fabric.collectionName === collectionName &&
-        i.options.fabric.color === selected.color
+        i.options.fabric.color === selected.color&&
+        i.options.fabric.imageId === (selected.fabricImageId || null)
       );
 
       if (existingIndex !== -1) {
@@ -216,25 +220,29 @@ const PublicDesignItems = () => {
   };
 
   return (
-    <PublicDesignItemsView
-      items={items}
-      orderItems={orderItems}
-      totalPrice={totalPrice} 
-      selectedFabrics={selectedFabrics}
-      fabricColors={fabricColors}
-      onSelectFabric={selectFabric}
-      onSelectColor={selectColor}
-      isAuth={isAuth}
-      customer={customer}
-      showAuthModal={showAuthModal}
-      onAddToOrder={addToOrder}
-      onIncreaseQty={increaseQty}
-      onDecreaseQty={decreaseQty}
-      onRemoveItem={removeItem}
-      onSubmitOrder={submitOrder}
-      onOpenAuth={() => setShowAuthModal(true)}
-      onCloseAuth={() => setShowAuthModal(false)}
-    />
+    <>
+      <PublicDesignItemsView
+        items={items}
+        orderItems={orderItems}
+        totalPrice={totalPrice} 
+        selectedFabrics={selectedFabrics}
+        fabricColors={fabricColors}
+        onSelectFabric={selectFabric}
+        onSelectColor={selectColor}
+        isAuth={isAuth}
+        customer={customer}
+        showAuthModal={showAuthModal}
+        onAddToOrder={addToOrder}
+        onIncreaseQty={increaseQty}
+        onDecreaseQty={decreaseQty}
+        onRemoveItem={removeItem}
+        onSubmitOrder={submitOrder}
+        onOpenAuth={() => setShowAuthModal(true)}
+        onCloseAuth={() => setShowAuthModal(false)}
+      />
+
+    {isAuth && customer.role === 'client' && <MyOrders />}
+  </>
   );
 };
 

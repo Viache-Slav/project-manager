@@ -167,39 +167,44 @@ const PublicDesignItemsView = ({
                 >
                   ✕
                 </button>
-                
-              </div><div className={styles.cartTotal}>
-                <span>Total:</span>
-                <strong>{totalPrice.toFixed(2)} zł</strong>
               </div>
             </div>
           ))}
+
+          <div className={styles.cartFooter}>
+            <div className={styles.cartTotal}>
+              <span>Total:</span>
+              <strong>{totalPrice.toFixed(2)} zł</strong>
+            </div>
+
+            {!isAuth ? (
+              <button
+                className={styles.submitButton}
+                onClick={onOpenAuth}
+              >
+                Register to place order
+              </button>
+            ) : (
+              <>
+                <div className={styles.customerInfo}>
+                  <div>{customer.name}</div>
+                  <div>{customer.email}</div>
+                  <div>{customer.phone}</div>
+                </div>
+
+                <button
+                  className={styles.submitButton}
+                  onClick={onSubmitOrder}
+                >
+                  Place order
+                </button>
+              </>
+            )}
+          </div>
         </div>
       )}
 
-      {!isAuth ? (
-        <button
-          className={styles.submitButton}
-          onClick={onOpenAuth}
-        >
-          Register to place order
-        </button>
-      ) : (
-        <>
-          <div className={styles.customerInfo}>
-            <div>{customer.name}</div>
-            <div>{customer.email}</div>
-            <div>{customer.phone}</div>
-          </div>
-
-          <button
-            className={styles.submitButton}
-            onClick={onSubmitOrder}
-          >
-            Place order
-          </button>
-        </>
-      )}
+      
 
       <Modal open={showAuthModal} onClose={onCloseAuth}>
         <ClientRegisterForm

@@ -15,6 +15,11 @@ const orderItemSchema = new Schema(
       required: true,
     },
 
+    productImage: {
+      type: Schema.Types.ObjectId,
+      ref: 'File',
+    },
+
     basePrice: {
       type: Number,
       required: true,
@@ -26,18 +31,15 @@ const orderItemSchema = new Schema(
       min: 1,
     },
 
-    options: {
-      materials: [
-        {
-          materialId: {
-            type: Schema.Types.ObjectId,
-            ref: 'Material',
-          },
-          name: String,
-          quantity: Number,
-          unit: String,
-        },
-      ],
+    fabric: {
+      brand: String,
+      collection: String,
+      color: String,
+      code: String,
+      image: {
+        type: Schema.Types.ObjectId,
+        ref: 'File',
+      },
     },
 
     finalPrice: {
@@ -62,6 +64,11 @@ const orderSchema = new Schema(
     },
 
     customer: {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+      },
       name: {
         type: String,
         required: true,

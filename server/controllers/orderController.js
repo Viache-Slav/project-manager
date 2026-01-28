@@ -24,7 +24,7 @@ export const createOrder = async (req, res) => {
     let totalPrice = 0;
 
     for (const row of items) {
-      const { designItemId, quantity, options } = row;
+      const { designItemId, quantity, options, productImageId } = row;
 
       if (!designItemId || !quantity || quantity <= 0) {
         return res.status(400).json({
@@ -55,9 +55,18 @@ export const createOrder = async (req, res) => {
       orderItems.push({
         designItem: item._id,
         title: item.title,
+        productImage: productImageId || item.images?.[0] || null,
         basePrice,
         quantity: qty,
-        options: options || {},
+        fabric: options?.fabric
+          ? {
+              brand: options.fabric.brand,
+              collection: options.fabric.collectionName,
+              color: options.fabric.color,
+              code: options.fabric.code || null,
+              image: options.fabric.imageId || null,
+            }
+          : null,
         finalPrice,
       });
     }
@@ -65,6 +74,7 @@ export const createOrder = async (req, res) => {
     const order = await Order.create({
       items: orderItems,
       customer: {
+        user: req.user._id,
         name: customer.name,
         email: customer.email,
         phone: customer.phone,
@@ -89,5 +99,18 @@ export const getAllOrders = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Failed to fetch orders' });
+  }
+};
+
+export const getMyOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({
+      'customer.user': req.user._id,
+    }).sort({ createdAt: -1 });
+
+    res.json(orders);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Failed to fetch my orders' });
   }
 };
