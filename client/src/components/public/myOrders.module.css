@@ -1,0 +1,89 @@
+.wrapper {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.empty {
+  padding: 16px;
+  color: #aaa;
+  font-size: 14px;
+}
+
+.card {
+  background: #1b1b1b;
+  border: 1px solid #2a2a2a;
+  padding: 16px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e6e6e6;
+  margin-bottom: 6px;
+}
+
+.items {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #2a2a2a;
+}
+
+.productImage {
+  width: 72px;
+  height: auto;
+  object-fit: contain;
+  background: #111;
+  border: 1px solid #2a2a2a;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f2f2f2;
+}
+
+.fabric {
+  font-size: 12px;
+  color: #bdbdbd;
+  line-height: 1.4;
+}
+
+.fabricImage {
+  margin-top: 6px;
+  width: 48px;
+  border: 1px solid #2a2a2a;
+  background: #111;
+}
+
+.meta {
+  margin-top: 6px;
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: #e0e0e0;
+}
+
+.meta span:last-child {
+  color: #fff;
+  font-weight: 600;
+}
