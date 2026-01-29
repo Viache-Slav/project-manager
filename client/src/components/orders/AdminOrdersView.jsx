@@ -1,6 +1,6 @@
 import styles from './AdminOrders.module.css';
 
-const AdminOrdersView = ({ loading, orders }) => {
+const AdminOrdersView = ({ loading, orders, onStatusChange }) => {
   if (loading) {
     return <p>Loading orders...</p>;
   }
@@ -20,7 +20,19 @@ const AdminOrdersView = ({ loading, orders }) => {
           </div>
 
           <div>
-            <strong>Status:</strong> {order.status}
+            <strong>Status:</strong>{' '}
+            <select
+              value={order.status}
+              onChange={(e) =>
+                onStatusChange(order._id, e.target.value)
+              }
+            >
+              <option value="new">new</option>
+              <option value="confirmed">confirmed</option>
+              <option value="in_work">in_work</option>
+              <option value="completed">completed</option>
+              <option value="cancelled">cancelled</option>
+            </select>
           </div>
 
           <div>
@@ -39,9 +51,48 @@ const AdminOrdersView = ({ loading, orders }) => {
 
             {order.items.map((item, index) => (
               <div key={index} className={styles.item}>
-                <div>{item.title}</div>
-                <div>Qty: {item.quantity}</div>
-                <div>Price: {item.finalPrice} zł</div>
+                {item.productImage && (
+                  <img
+                    className={styles.productImage}
+                    src={`${import.meta.env.VITE_API_URL}/files/${item.productImage}`}
+                    alt={item.title}
+                  />
+                )}
+
+                <div className={styles.itemContent}>
+                  <div className={styles.itemTitle}>{item.title}</div>
+
+                  {item.fabric && (
+                    <div className={styles.fabric}>
+                      <div>
+                        Fabric:
+                        <strong>
+                          {' '}
+                          {item.fabric.brand} / {item.fabric.collection}
+                        </strong>
+                      </div>
+
+                      <div>Color: {item.fabric.color}</div>
+
+                      {item.fabric.code && (
+                        <div>Code: {item.fabric.code}</div>
+                      )}
+
+                      {item.fabric.image && (
+                        <img
+                          className={styles.fabricImage}
+                          src={`${import.meta.env.VITE_API_URL}/files/${item.fabric.image}`}
+                          alt="fabric"
+                        />
+                      )}
+                    </div>
+                  )}
+
+                  <div className={styles.meta}>
+                    <span>Qty: {item.quantity}</span>
+                    <span>Item total: {item.finalPrice} zł</span>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
