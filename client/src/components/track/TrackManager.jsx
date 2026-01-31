@@ -5,6 +5,7 @@ import styles from './TrackManager.module.css';
 const TrackManager = () => {
   const [routes, setRoutes] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const [quantities, setQuantities] = useState({});
   const [departureTime, setDepartureTime] = useState('');
@@ -22,9 +23,23 @@ const TrackManager = () => {
     }
   };
 
+  const fetchOrders = async () => {
+    try {
+      const { data } = await axios.get('/orders');
+
+      const productionOrders = data.filter((order) =>
+        ['new', 'confirmed', 'in_work'].includes(order.status)
+      );
+
+      setOrders(productionOrders);
+    } catch (err) {
+      console.error('Error fetching orders', err);
+    }
+  };
+
   const fetchProducts = async () => {
     try {
-      const { data } = await axios.get('/products');
+      const { data } = await axios.get('/design-items/public/design-items');
       setProducts(data);
       setQuantities({});
     } catch (err) {
@@ -34,6 +49,7 @@ const TrackManager = () => {
 
   const handleCreateClick = () => {
     setShowForm(true);
+    fetchOrders();
     fetchProducts();
   };
 
@@ -95,6 +111,31 @@ const TrackManager = () => {
                   className={styles['track-manager__input']}
                 />
               </label>
+
+              {orders.length > 0 && (
+                <>
+                  <h3>Ordered items (from orders):</h3>
+
+                  <div className={styles.ordered}>
+                    {orders.map((order) =>
+                      order.items.map((item, idx) => (
+                        <div key={`${order._id}-${idx}`} className={styles.orderedItem}>
+                          <div>
+                            <strong>{item.title}</strong> — Qty: {item.quantity}
+                          </div>
+
+                          {item.fabric && (
+                            <div className={styles.orderedFabric}>
+                              Fabric: {item.fabric.brand} / {item.fabric.collection} / {item.fabric.color}
+                              {item.fabric.code && ` (${item.fabric.code})`}
+                            </div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
 
               <h3>Products:</h3>
               <div className={styles['products-grid']}>
