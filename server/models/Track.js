@@ -9,7 +9,7 @@ const trackSchema = new mongoose.Schema({
     {
       productId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
+        ref: 'DesignItem',
         required: true,
       },
       quantity: {

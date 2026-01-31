@@ -21,7 +21,6 @@ export const createTrack = async (req, res) => {
 export const getTracks = async (req, res) => {
   try {
     const tracks = await Track.find()
-      .populate('items.productId', 'name')
       .sort({ departureTime: -1 });
 
     res.json(tracks);
