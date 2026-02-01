@@ -1,4 +1,4 @@
-.track-manager {
+.trackManager {
   padding: 2rem;
   background-color: #171717;
   border-radius: 10px;
@@ -6,12 +6,12 @@
   margin-top: 2rem;
 }
 
-.track-manager__heading {
+.trackManagerHeading {
   font-size: 1.5rem;
   margin-bottom: 1rem;
 }
 
-.track-manager__button {
+.trackManagerButton {
   background-color: #1976d2;
   color: white;
   border: none;
@@ -22,17 +22,17 @@
   margin-right: 1rem;
 }
 
-.track-manager__button:hover {
+.trackManagerButton:hover {
   background-color: #1565c0;
 }
 
-.track-manager__label {
+.trackManagerLabel {
   display: block;
   font-weight: 500;
   margin-bottom: 0.5rem;
 }
 
-.track-manager__input {
+.trackManagerInput {
   margin-right: 20px;
   padding: 4px;
   border-radius: 4px;
@@ -41,35 +41,23 @@
   color: white;
 }
 
-.track-manager__input--quantity {
-  width: 40px;
-}
-
-.track-manager__row {
+.productsGrid {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 5px;
-  margin-bottom: 1rem;
-}
-
-.track-manager__list {
+.trackManagerList {
   margin-top: 1.5rem;
   padding-left: 1rem;
 }
 
-.track-manager__item {
+.trackManagerItem {
   margin-bottom: 0.5rem;
   font-size: 0.95rem;
 }
 
-.modal-overlay {
+.modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -82,7 +70,7 @@
   z-index: 1000;
 }
 
-.modal-content {
+.modalContent {
   background-color: #1e1e1e;
   padding: 2rem;
   border-radius: 10px;
@@ -104,11 +92,48 @@
   border-bottom: 1px dashed #333;
 }
 
-.orderedTitle {
-  font-weight: 500;
-}
-
 .orderedFabric {
   font-size: 12px;
   color: #999;
+}
+
+.productRow {
+  display: grid;
+  grid-template-columns: 1.5fr 2fr 1.5fr 0.8fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.productTitle {
+  font-weight: 500;
+}
+
+.select {
+  background: #1e1e1e;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 6px;
+}
+
+.qtyInput {
+  width: 20px;
+}
+
+.fabricPicker {
+  min-width: 220px;
+}
+
+.fabricSelected {
+  background: #1e1e1e;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: #fff;
+  font-size: 14px;
+}
+
+.fabricSelected:hover {
+  border-color: #3b82f6;
 }
