@@ -1,4 +1,5 @@
 import Track from '../models/Track.js';
+import Order from '../models/Order.js';
 
 export const createTrack = async (req, res) => {
   try {
@@ -10,6 +11,17 @@ export const createTrack = async (req, res) => {
 
     const track = new Track({ departureTime, items });
     await track.save();
+
+    const orderIds = items
+      .filter(i => i.source === 'order' && i.orderId)
+      .map(i => i.orderId);
+
+    if (orderIds.length) {
+      await Order.updateMany(
+        { _id: { $in: orderIds } },
+        { status: 'in_work' }
+      );
+    }
 
     res.status(201).json(track);
   } catch (err) {
