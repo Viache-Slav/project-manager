@@ -62,21 +62,91 @@ export const loginUser = async (req, res) => {
 };
 
 export const googleLogin = async (req, res) => {
-  const token = req.body.credential || req.body.token;
-  try {
-    const ticket = await client.verifyIdToken({ idToken: token, audience: process.env.GOOGLE_CLIENT_ID });
-    const payload = ticket.getPayload();
-    const { sub, email, name } = payload;
+  const idToken = req.body?.credential || req.body?.token;
+  const accessToken = req.body?.accessToken;
 
-    let user = await User.findOne({ email });
-    if (!user) {
-      user = await User.create({ username: name, email, googleId: sub, role: 'employee', status: 'pending' });
+  try {
+    if (!idToken && !accessToken) {
+      return res.status(400).json({
+        message: 'credential (idToken) or accessToken is required',
+      });
     }
 
-    const jwtToken = jwt.sign({ id: user._id, email: user.email, role: user.role, username: user.username }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.status(200).json({ message: 'Google login successful', token: jwtToken, user: { id: user._id, username: user.username, email: user.email, role: user.role } });
+    let sub;
+    let email;
+    let name;
+
+    if (idToken) {
+      const ticket = await client.verifyIdToken({
+        idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      sub = payload.sub;
+      email = payload.email;
+      name = payload.name;
+    }
+
+    if (!idToken && accessToken) {
+      const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (!r.ok) {
+        const text = await r.text().catch(() => '');
+        return res.status(401).json({
+          message: 'Google userinfo request failed',
+          error: text || `HTTP ${r.status}`,
+        });
+      }
+
+      const data = await r.json();
+      sub = data.sub;
+      email = data.email;
+      name = data.name || data.given_name || 'Google User';
+    }
+
+    if (!email) {
+      return res.status(401).json({
+        message: 'Google auth failed: email not provided',
+      });
+    }
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = await User.create({
+        username: name,
+        email,
+        googleId: sub,
+        role: 'employee',
+        status: 'pending',
+      });
+    }
+
+    const jwtToken = jwt.sign(
+      { id: user._id, email: user.email, role: user.role, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    return res.status(200).json({
+      message: 'Google login successful',
+      token: jwtToken,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (error) {
-    res.status(401).json({ message: 'Google token verification failed' });
+    console.error('googleLogin error:', error?.message || error);
+    return res.status(401).json({
+      message: 'Google auth failed',
+      error: error?.message || 'Unknown error',
+    });
   }
 };
 

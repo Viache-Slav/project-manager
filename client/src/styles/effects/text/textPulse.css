@@ -1,0 +1,21 @@
+@keyframes textPulseSoft {
+  0%   { opacity: 0.55; text-shadow: 0 0 0 rgba(255, 210, 122, 0); }
+  50%  { opacity: 1;    text-shadow: 0 0 18px rgba(255, 210, 122, 0.35); }
+  100% { opacity: 0.55; text-shadow: 0 0 0 rgba(255, 210, 122, 0); }
+}
+
+.text-pulse-soft {
+  animation: textPulseSoft 2.8s ease-in-out infinite;
+}
+
+.text-pulse-fast {
+  animation: textPulseSoft 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-pulse-soft,
+  .text-pulse-fast {
+    animation: none !important;
+  }
+}
+

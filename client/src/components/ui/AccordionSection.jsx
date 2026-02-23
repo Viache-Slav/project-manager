@@ -1,29 +1,21 @@
 import { useState } from 'react';
 
-const AccordionSection = ({ title, children, defaultOpen = false }) => {
+const AccordionSection = ({ title, children, defaultOpen = false, className = '' }) => {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div style={{ marginBottom: '16px' }}>
-      <div
-        onClick={() => setOpen(!open)}
-        style={{
-          cursor: 'pointer',
-          padding: '12px 16px',
-          background: '#1e1e1e',
-          borderRadius: '10px',
-          fontWeight: '600',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}
+    <div className={className}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between gap-4 px-4 py-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition"
       >
-        <span>{title}</span>
-        <span>{open ? '−' : '+'}</span>
-      </div>
+        <span className="font-semibold text-left">{title}</span>
+        <span className="text-white/70">{open ? '−' : '+'}</span>
+      </button>
 
       {open && (
-        <div style={{ marginTop: '12px' }}>
+        <div className="mt-3">
           {children}
         </div>
       )}

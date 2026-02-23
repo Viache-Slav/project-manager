@@ -1,106 +1,33 @@
-import styles from './AuthForm.module.css';
-import { GoogleLogin } from '@react-oauth/google';
+import BackgroundEffects from '../background/BackgroundEffects';
+import AuthCard from './AuthCard';
+import AuthSocial from './AuthSocial';
+import AuthFields from './AuthFields';
 
-const AuthFormView = ({
-  isLogin,
-  formData,
-  error,
-
-  onChange,
-  onSubmit,
-  onToggleMode,
-  onGoogleSuccess,
-  onGoogleError,
-}) => {
+const AuthFormView = (props) => {
   return (
-    <div className={styles['auth-form']}>
-      <p className={styles['auth-form__title']}>
-        You can log in with your Google Account
-      </p>
+    <div className="relative w-[min(420px,92vw)] overflow-hidden rounded-2xl">
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          marginBottom: '1rem',
-        }}
-      >
-        <GoogleLogin
-          onSuccess={onGoogleSuccess}
-          onError={onGoogleError}
-        />
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <BackgroundEffects />
       </div>
 
-      <p style={{ margin: '1rem 0' }}>
-        Or use your email and password:
-      </p>
-
-      <form
-        onSubmit={onSubmit}
-        className={styles['auth-form__form']}
-      >
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={onChange}
-          required
-          className={styles['auth-form__input']}
-        />
-
-        {!isLogin && (
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={formData.username}
-            onChange={onChange}
-            required
-            className={styles['auth-form__input']}
+      <div className="relative z-10">
+        <AuthCard>
+          <AuthSocial
+            onGoogleSuccess={props.onGoogleSuccess}
+            onGoogleError={props.onGoogleError}
           />
-        )}
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={onChange}
-          required
-          className={styles['auth-form__input']}
-        />
-
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '1rem',
-            marginTop: '1rem',
-          }}
-        >
-          <button
-            type="submit"
-            className={`${styles['auth-form__button']} ${styles['auth-form__button--primary']}`}
-          >
-            {isLogin ? 'LOG IN' : 'REGISTER'}
-          </button>
-
-          <button
-            type="button"
-            onClick={onToggleMode}
-            className={`${styles['auth-form__button']} ${styles['auth-form__button--secondary']}`}
-          >
-            {isLogin ? 'REGISTER' : 'LOGIN'}
-          </button>
-        </div>
-      </form>
-
-      {error && (
-        <p className={styles['auth-form__error']}>
-          {error}
-        </p>
-      )}
+          <AuthFields
+            isLogin={props.isLogin}
+            formData={props.formData}
+            onChange={props.onChange}
+            onSubmit={props.onSubmit}
+            onToggleMode={props.onToggleMode}
+            error={props.error}
+          />
+        </AuthCard>
+      </div>
     </div>
   );
 };
