@@ -1,0 +1,136 @@
+:root {
+  --container-max: 100%;
+  --container-pad: 16px;
+  --header-height: 40px;
+  --logo-scale: 0.59;
+  --login-icon-size: 20px;
+
+  --color-text: #ffffff;
+  --color-brand: #e39f0a;
+  --color-brand-hover: #ffd27a;
+  --color-login: #eeddb98c;
+  --color-text-muted: rgba(255,255,255,0.8);
+
+  --color-header: rgba(84, 40, 12, 0.60);
+  --color-footer: rgba(84, 40, 12, 0.70);
+  --color-surface: rgba(255, 255, 255, 0.05);
+  --color-borderSoft: rgba(255, 255, 255, 0.10);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: transparent;
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.container-app {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--container-pad);
+  padding-right: var(--container-pad);
+}
+
+@layer components {
+  .hero-title {
+    @apply w-[300px] md:w-[600px]
+      text-[30px] sm:text-[35px] md:text-[60px]
+      text-center tracking-normal cursor-default font-bold;
+  }
+
+  .hero-title-shadow {
+    @apply drop-shadow-[0_10px_10px_rgba(0,0,0,0.6)];
+  }
+
+  .hero-center {
+    @apply h-full flex items-center justify-center translate-y-14;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none;    /* Firefox */
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;            /* Chrome/Safari */
+  }
+}
+
+/* Fullscreen fix for our gallery box */
+.gallery-fs:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Firefox */
+.gallery-fs:-moz-full-screen {
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Safari */
+.gallery-fs:-webkit-full-screen {
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  :root {
+    --container-max: 600px;
+    --container-pad: 32px;
+    --header-height: 60px;
+    --logo-scale: 0.9;
+    --login-icon-size: 30px;
+  }
+}
+
+@media (min-width: 900px) {
+  :root {
+    --container-max: 860px;
+  }
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --container-max: 1100px;
+    --container-pad: 40px;
+    --header-height: 75px;
+    --logo-scale: 1.15;
+    --login-icon-size: 40px;
+  }
+}

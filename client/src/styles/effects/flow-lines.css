@@ -1,0 +1,43 @@
+.line3d-wrap {
+  perspective: 900px;
+  transform-style: preserve-3d;
+}
+
+.line3d {
+  transform-style: preserve-3d;
+  transform-origin: center;
+  will-change: transform;
+  mix-blend-mode: screen;
+  opacity: 0.9;
+  filter:
+    drop-shadow(0 0 12px rgba(255, 210, 122, 0.8))
+    drop-shadow(0 0 30px rgba(255, 210, 122, 0.5));
+}
+
+@keyframes flowFar {
+  0%   { transform: translateX(0) rotateZ(-1deg) rotateX(10deg) rotateY(-14deg); }
+  100% { transform: translateX(-50%) rotateZ(-1deg) rotateX(10deg) rotateY(-14deg); }
+}
+
+@keyframes flowMid {
+  0%   { transform: translateX(0) rotateZ(1deg) rotateX(14deg) rotateY(16deg) scale(1.02); }
+  100% { transform: translateX(-50%) rotateZ(1deg) rotateX(14deg) rotateY(16deg) scale(1.02); }
+}
+
+@keyframes flowNear {
+  0%   { transform: translateX(0) rotateZ(-2deg) rotateX(18deg) rotateY(-18deg) scale(1.06); }
+  100% { transform: translateX(-50%) rotateZ(-2deg) rotateX(18deg) rotateY(-18deg) scale(1.06); }
+}
+
+.line3d--far  { animation: flowFar  26s ease-in-out infinite; opacity: 0.50; }
+.line3d--mid  { animation: flowMid  18s ease-in-out infinite; opacity: 0.50; }
+.line3d--near { animation: flowNear 14s ease-in-out infinite; opacity: 0.50; }
+
+@media (prefers-reduced-motion: reduce) {
+  .line3d--far,
+  .line3d--mid,
+  .line3d--near,
+  .wave {
+    animation: none !important;
+  }
+}

@@ -24,12 +24,6 @@ select {
   border: none;
 }
 
-button {
-  margin-top: 10px;
-  padding: 10px;
-  cursor: pointer;
-}
-
 .message {
   margin-top: 10px;
 }

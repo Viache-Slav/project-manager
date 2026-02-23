@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from '../../api/axios';
 import AuthFormView from './AuthFormView';
 
-const AuthForm = () => {
+const AuthForm = ({ onSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
@@ -36,15 +36,14 @@ const AuthForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const url = isLogin
-      ? `${import.meta.env.VITE_API_URL}/auth/login`
-      : `${import.meta.env.VITE_API_URL}/auth/register`;
+    const url = isLogin ? '/auth/login' : '/auth/register';
 
     try {
       const res = await axios.post(url, formData);
 
       if (isLogin && res.data.token) {
         localStorage.setItem('token', res.data.token);
+        onSuccess?.();
         navigate('/dashboard');
         return;
       }
@@ -68,25 +67,18 @@ const AuthForm = () => {
     }
   };
 
-  const handleGoogleSuccess = (credentialResponse) => {
-    axios
-      .post(
-        `${import.meta.env.VITE_API_URL}/auth/google-login`,
-        {
-          credential:
-            credentialResponse.credential,
-        }
-      )
+  const handleGoogleSuccess = (tokenResponse) => {
+    axios.post('/auth/google-login', {
+      accessToken: tokenResponse.access_token,
+    })
       .then((res) => {
-        localStorage.setItem(
-          'token',
-          res.data.token
-        );
+        localStorage.setItem('token', res.data.token);
+        onSuccess?.();
         navigate('/dashboard');
       })
-      .catch(() =>
-        setError('Google login failed')
-      );
+      .catch((err) => {
+        setError(err.response?.data?.message || 'Google login failed');
+      });
   };
 
   return (

@@ -1,0 +1,22 @@
+@keyframes waveMove {
+  0%   { transform: translateX(-10%) translateY(0) rotate(0deg); }
+  50%  { transform: translateX(10%)  translateY(10%) rotate(10deg); }
+  100% { transform: translateX(-10%) translateY(0) rotate(0deg); }
+}
+
+.wave {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  border-radius: 40%;
+  filter: blur(80px);
+  opacity: 0.60;
+  animation: waveMove 14s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.wave-1 { background: radial-gradient(circle at 30% 30%, rgba(151, 106, 9, 0.65), transparent 60%); }
+.wave-2 { background: radial-gradient(circle at 70% 70%, rgba(157, 105, 3, 0.923), transparent 60%); animation-duration: 20s; }
+.wave-3 { background: radial-gradient(circle at 50% 20%, rgba(184, 180, 182, 0.954), transparent 65%); animation-duration: 26s; }
