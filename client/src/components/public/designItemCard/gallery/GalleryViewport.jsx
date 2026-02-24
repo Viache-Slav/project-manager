@@ -66,45 +66,57 @@ const GalleryViewport = ({
   return (
     <div ref={fsRef} className={rootCls}>
       <div ref={trackRef} className={trackCls}>
-        {images.map((id, idx) => (
-          <div
-            key={id}
-            className="w-full flex-[0_0_100%] snap-center [scroll-snap-stop:always]"
-          >
-            <div ref={idx === activeIndex ? frameRef : null} className={frameCls}>
-              <img
-                src={`${import.meta.env.VITE_API_URL}/files/${id}`}
-                alt={`${title} ${idx + 1}`}
-                className={`${imgCls} touch-none`}
-                style={idx === activeIndex ? activeStyle : undefined}
-                draggable="false"
-                onMouseDown={(e) => idx === activeIndex && onMouseDown(e)}
-                onMouseMove={(e) => idx === activeIndex && onMouseMove(e)}
-                onPointerDown={(e) => idx === activeIndex && onPointerDown(e)}
-                onPointerMove={(e) => idx === activeIndex && onPointerMove(e)}
-                onMouseUp={stopDragging}
-                onMouseLeave={stopDragging}
-                onPointerUp={onPointerUp}
-                onPointerCancel={onPointerUp}
-                onClick={() => {
-                  if (dragMovedRef.current) return;
+        {images.map((id, idx) => {
+          const isActive = idx === activeIndex;
+          const imgTouchCls = isActive && zoom > 1 ? 'touch-none' : '';
 
-                  if (idx !== activeIndex) {
-                    goTo(idx);
-                    return;
+          return (
+            <div
+              key={id}
+              className="w-full flex-[0_0_100%] snap-center [scroll-snap-stop:always]"
+            >
+              <div ref={isActive ? frameRef : null} className={frameCls}>
+                <img
+                  src={`${import.meta.env.VITE_API_URL}/files/${id}`}
+                  alt={`${title} ${idx + 1}`}
+                  className={`${imgCls} ${imgTouchCls}`}
+                  style={
+                    isActive
+                      ? {
+                          ...activeStyle,
+                          touchAction: zoom > 1 ? 'none' : 'pan-x',
+                        }
+                      : { touchAction: 'pan-x' }
                   }
+                  draggable="false"
+                  onMouseDown={(e) => isActive && onMouseDown(e)}
+                  onMouseMove={(e) => isActive && onMouseMove(e)}
+                  onPointerDown={(e) => isActive && onPointerDown(e)}
+                  onPointerMove={(e) => isActive && onPointerMove(e)}
+                  onMouseUp={stopDragging}
+                  onMouseLeave={stopDragging}
+                  onPointerUp={onPointerUp}
+                  onPointerCancel={onPointerUp}
+                  onClick={() => {
+                    if (dragMovedRef.current) return;
 
-                  if (zoom > 1) {
-                    resetZoom();
-                    return;
-                  }
+                    if (!isActive) {
+                      goTo(idx);
+                      return;
+                    }
 
-                  toggleFullscreen();
-                }}
-              />
+                    if (zoom > 1) {
+                      resetZoom();
+                      return;
+                    }
+
+                    toggleFullscreen();
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
