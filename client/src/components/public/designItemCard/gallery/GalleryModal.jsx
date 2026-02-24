@@ -26,6 +26,7 @@ const GalleryModal = ({
 }) => {
   const trackRef = useRef(null);
   const fsRef = useRef(null);
+  const frameRef = useRef(null);
 
   const { isFs, toggleFullscreen, exitFullscreen } = useFullscreen(fsRef);
 
@@ -37,22 +38,18 @@ const GalleryModal = ({
     onMouseDown,
     onMouseMove,
     stopDragging,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
     resetZoom,
     hardReset,
     setOffset,
   } = useZoomDrag({
     enabled: open,
-    containerRef: trackRef,
+    containerRef: frameRef,
   });
 
-  const {
-    hasMany,
-    prevIndex,
-    nextIndex,
-    goTo,
-    prev,
-    next,
-  } = useGalleryNavigation({
+  const { hasMany, prevIndex, nextIndex, goTo, prev, next } = useGalleryNavigation({
     images,
     activeIndex,
     setActiveIndex,
@@ -74,14 +71,12 @@ const GalleryModal = ({
 
   useResetZoomOnOpen({ open, activeIndex, resetZoom });
 
-  const containerCls =
-    'mx-auto w-full max-w-[1200px] px-4 lg:px-8 pb-6 box-border';
+  const containerCls = 'mx-auto w-full max-w-[1200px] px-4 lg:px-8 pb-6 box-border';
 
   const galleryWrapperCls =
     'group relative overflow-hidden rounded-2xl border border-white/10 bg-black/70 shadow-2xl backdrop-blur p-2 sm:p-3';
 
-  const overlayCls =
-    'pointer-events-none absolute inset-0 bg-black/25';
+  const overlayCls = 'pointer-events-none absolute inset-0 bg-black/25';
 
   const leftGradientCls =
     'pointer-events-none absolute inset-y-0 left-0 w-14 sm:w-24 bg-gradient-to-r from-black/80 to-transparent';
@@ -89,19 +84,13 @@ const GalleryModal = ({
   const rightGradientCls =
     'pointer-events-none absolute inset-y-0 right-0 w-14 sm:w-24 bg-gradient-to-l from-black/80 to-transparent';
 
-  const commentCls =
-    'mt-3 rounded-2xl bg-black/50 p-4 text-sm text-white/85 backdrop-blur';
+  const commentCls = 'mt-3 rounded-2xl bg-black/50 p-4 text-sm text-white/85 backdrop-blur';
 
   return (
     <Modal open={open} onClose={onClose}>
       <div className={containerCls}>
         <div className={galleryWrapperCls}>
-          <GallerySidePreviews
-            images={images}
-            prevIndex={prevIndex}
-            nextIndex={nextIndex}
-            isFs={isFs}
-          />
+          <GallerySidePreviews images={images} prevIndex={prevIndex} nextIndex={nextIndex} isFs={isFs} />
 
           <div className={overlayCls} />
           <div className={leftGradientCls} />
@@ -113,6 +102,7 @@ const GalleryModal = ({
             isFs={isFs}
             fsRef={fsRef}
             trackRef={trackRef}
+            frameRef={frameRef}
             activeIndex={activeIndex}
             goTo={goTo}
             zoom={zoom}
@@ -122,6 +112,9 @@ const GalleryModal = ({
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             stopDragging={stopDragging}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
             resetZoom={resetZoom}
             toggleFullscreen={toggleFullscreen}
             wheelEnabled={open}
@@ -136,10 +129,7 @@ const GalleryModal = ({
             </>
           )}
 
-          <GalleryCounter
-            activeIndex={activeIndex}
-            total={images.length}
-          />
+          <GalleryCounter activeIndex={activeIndex} total={images.length} />
 
           {!isFs && <GalleryHint />}
         </div>
