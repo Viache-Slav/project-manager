@@ -6,6 +6,7 @@ const GalleryViewport = ({
   isFs,
   fsRef,
   trackRef,
+  frameRef,
   activeIndex,
   goTo,
   zoom,
@@ -15,6 +16,9 @@ const GalleryViewport = ({
   onMouseDown,
   onMouseMove,
   stopDragging,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
   resetZoom,
   toggleFullscreen,
   wheelEnabled,
@@ -22,15 +26,15 @@ const GalleryViewport = ({
   setOffset,
 }) => {
   useWheelZoom({
-  enabled: wheelEnabled,
-  isFs,
-  trackRef,
-  zoom,
-  setZoom,
-  setOffset,
-});
+    enabled: wheelEnabled,
+    isFs,
+    trackRef: frameRef,
+    zoom,
+    setZoom,
+    setOffset,
+  });
 
-const rootCls = [
+  const rootCls = [
     'gallery-fs relative mx-auto w-full',
     isFs ? 'max-w-none' : 'max-w-none sm:max-w-[980px]',
   ].join(' ');
@@ -56,12 +60,7 @@ const rootCls = [
   const activeStyle = {
     transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
     transformOrigin: 'center center',
-    cursor:
-      zoom > 1
-        ? isDragging
-          ? 'grabbing'
-          : 'grab'
-        : 'zoom-in',
+    cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'zoom-in',
   };
 
   return (
@@ -72,17 +71,21 @@ const rootCls = [
             key={id}
             className="w-full flex-[0_0_100%] snap-center [scroll-snap-stop:always]"
           >
-            <div className={frameCls}>
+            <div ref={idx === activeIndex ? frameRef : null} className={frameCls}>
               <img
                 src={`${import.meta.env.VITE_API_URL}/files/${id}`}
                 alt={`${title} ${idx + 1}`}
-                className={imgCls}
+                className={`${imgCls} touch-none`}
                 style={idx === activeIndex ? activeStyle : undefined}
                 draggable="false"
                 onMouseDown={(e) => idx === activeIndex && onMouseDown(e)}
                 onMouseMove={(e) => idx === activeIndex && onMouseMove(e)}
+                onPointerDown={(e) => idx === activeIndex && onPointerDown(e)}
+                onPointerMove={(e) => idx === activeIndex && onPointerMove(e)}
                 onMouseUp={stopDragging}
                 onMouseLeave={stopDragging}
+                onPointerUp={onPointerUp}
+                onPointerCancel={onPointerUp}
                 onClick={() => {
                   if (dragMovedRef.current) return;
 
