@@ -84,19 +84,30 @@ const useZoomDrag = ({ enabled, containerRef }) => {
     }, 0);
   }, []);
 
-  const onMouseDown = useCallback((e) => startDrag(e.clientX, e.clientY), [startDrag]);
-  const onMouseMove = useCallback((e) => moveDrag(e.clientX, e.clientY), [moveDrag]);
+  const onMouseDown = useCallback(
+    (e) => startDrag(e.clientX, e.clientY),
+    [startDrag]
+  );
+
+  const onMouseMove = useCallback(
+    (e) => moveDrag(e.clientX, e.clientY),
+    [moveDrag]
+  );
 
   const onPointerDown = useCallback(
     (e) => {
       if (!enabled) return;
 
+      pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      const pts = [...pointersRef.current.values()];
+
+      // 1 палец + zoom=1 -> отдаём жест треку (листать)
+      if (pts.length === 1 && zoom <= 1) return;
+
+      // pinch или drag при zoom>1 -> перехватываем pointer
       try {
         e.currentTarget.setPointerCapture?.(e.pointerId);
       } catch {}
-
-      pointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      const pts = [...pointersRef.current.values()];
 
       if (pts.length === 1) {
         startDrag(e.clientX, e.clientY);
@@ -127,7 +138,7 @@ const useZoomDrag = ({ enabled, containerRef }) => {
         dragMovedRef.current = true;
       }
     },
-    [enabled, containerRef, startDrag, zoom, offset]
+    [enabled, zoom, containerRef, startDrag, offset]
   );
 
   const onPointerMove = useCallback(

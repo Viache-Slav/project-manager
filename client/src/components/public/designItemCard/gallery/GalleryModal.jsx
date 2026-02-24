@@ -90,7 +90,12 @@ const GalleryModal = ({
     <Modal open={open} onClose={onClose}>
       <div className={containerCls}>
         <div className={galleryWrapperCls}>
-          <GallerySidePreviews images={images} prevIndex={prevIndex} nextIndex={nextIndex} isFs={isFs} />
+          <GallerySidePreviews
+            images={images}
+            prevIndex={prevIndex}
+            nextIndex={nextIndex}
+            isFs={isFs}
+          />
 
           <div className={overlayCls} />
           <div className={leftGradientCls} />
